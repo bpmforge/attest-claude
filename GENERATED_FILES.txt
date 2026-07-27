@@ -205,6 +205,7 @@ exemplars/security-finding.md
 exemplars/sequence-diagram.md
 references/adr-template.md
 references/anti-slop-audit.md
+references/antv-x6-v3.md
 references/cloud-cost-checklist.md
 references/code-health-checklist.md
 references/context7-mcp.md
