@@ -238,6 +238,8 @@ references/validator-performance.md
 references/wcag-audit-checklist.md
 scripts/api-surface.mjs
 scripts/build-agents.mjs
+scripts/delegation-gate.mjs
+scripts/delegation-metrics.mjs
 scripts/fix-verify.mjs
 scripts/gen-status-report.mjs
 scripts/lib/derive-lanes.mjs
@@ -257,6 +259,7 @@ scripts/lib/tracker-model.mjs
 scripts/lib/user-stories.mjs
 scripts/loop-learn.mjs
 scripts/mermaid-fix.mjs
+scripts/review-packet.mjs
 scripts/run-plan.mjs
 scripts/telemetry-report.mjs
 scripts/validators/_lib.sh
@@ -297,6 +300,7 @@ scripts/validators/validate-handoff-discipline.sh
 scripts/validators/validate-iac.sh
 scripts/validators/validate-improve-coverage.sh
 scripts/validators/validate-infrastructure.sh
+scripts/validators/validate-invariants.sh
 scripts/validators/validate-inventory.sh
 scripts/validators/validate-jira-hygiene.sh
 scripts/validators/validate-lint.sh
@@ -338,3 +342,4 @@ scripts/validators/validate-user-stories.sh
 scripts/validators/validate-ux-spec.sh
 scripts/validators/validate-vendor-provenance.sh
 scripts/validators/validate-wcag-coverage.sh
+scripts/verify-receipt.mjs

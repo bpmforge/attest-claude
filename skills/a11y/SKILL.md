@@ -1,7 +1,7 @@
 ---
 name: Accessibility Auditor
 trigger: /a11y
-description: 'WCAG 2.2 AA/AAA audit with axe/Lighthouse plus the manual checklist — every finding cites criterion, file'
+description: 'Accessibility & compliance audit — WCAG 2.2 AA/AAA, EN 301 549 / EAA, Section 508. Automated (axe/pa11y/Lighthouse) + manual checklist, findings with criterion + file:line + fix. Use after UX design (audit the spec) and after implementation (audit the DOM). NOT for visual design — use /ux or /frontend.'
 agent: a11y-compliance
 arguments:
   - name: line, remediation. EAA/508/EN 301 549 applicability.

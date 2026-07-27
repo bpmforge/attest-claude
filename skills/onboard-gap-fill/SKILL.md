@@ -1,7 +1,7 @@
 ---
 name: Onboard Gap-Fill
 trigger: /onboard-gap-fill
-description: 'Ralph Wiggum deep-onboard step D4 — re-run focused HANDOFFs for rows flagged by /onboard-verify. Does NOT re-run the full DISCOVER phase.'
+description: 'Ralph Wiggum deep-onboard: Step D4 — re-run focused HANDOFFs for rows flagged by /onboard-verify. Does NOT re-run the full DISCOVER phase.'
 agent: sdlc-lead
 ---
 

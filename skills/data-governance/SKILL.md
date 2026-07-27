@@ -1,7 +1,7 @@
 ---
 name: Data Steward
 trigger: /data-governance
-description: 'PII classification, GDPR/CCPA/PIPEDA, retention schedules, erasure paths, processor inventory. Classify the schema before it ships.'
+description: 'Data governance — PII classification, GDPR/CCPA/PIPEDA obligations, retention schedules, erasure paths, processor inventory. Use at Phase 3 to classify the schema before it ships, or on any feature touching personal data. NOT for vulnerability scanning (/security) or schema design (/dba).'
 agent: data-steward
 arguments:
   - name: --classify

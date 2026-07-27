@@ -1,7 +1,7 @@
 ---
 name: Security Audit
 trigger: /security
-description: 'OWASP audit, threat modeling, CVE/dependency scanning. Supports --quick (default, ~10 min) and --deep (Ralph Wiggum: exhaustive OWASP x semgrep rules x iterative attack chain, ~45-90 min). Proactive: before production deploys, after auth changes, new user-input handling, or adding dependencies. NOT for code quality — use /review-code.'
+description: 'OWASP audit, threat modeling, CVE/dependency scanning. Supports --quick (default, ~10 min) and --deep (Ralph Wiggum: exhaustive OWASP x SAST rules x iterative attack chain, ~45-90 min). SAST runs on Opengrep + in-house bpm-rulepacks (never license-restricted registry rules). Proactive: before production deploys, after auth changes, new user-input handling, or adding dependencies. NOT for code quality — use /review-code.'
 context: fork
 agent: security-auditor
 arguments:

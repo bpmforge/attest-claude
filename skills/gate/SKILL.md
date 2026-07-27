@@ -1,7 +1,7 @@
 ---
 name: Gate
 trigger: /gate
-description: 'SDLC phase gate — validates exit criteria before advancing phases. Use after completing all deliverables for a phase. Prerequisite: /sdlc must be initialized first.'
+description: 'SDLC phase gate — runs the automated validators for the current phase and reports gaps. Use after completing all deliverables for a phase. Wraps scripts/validators/validate-phase-gate.sh.'
 ---
 
 # Gate Skill

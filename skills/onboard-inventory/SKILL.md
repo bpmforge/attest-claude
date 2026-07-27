@@ -1,7 +1,7 @@
 ---
 name: Onboard Inventory
 trigger: /onboard-inventory
-description: 'Ralph Wiggum deep-onboard step D1 — enumerate every unit in the codebase (ROUTE / TABLE / SERVICE / FLOW / ENTRY) into docs/onboard/INVENTORY.md. Triggered by /sdlc onboard --deep or invoked directly for inventory refresh.'
+description: 'Ralph Wiggum deep-onboard: Step D1 — enumerate every unit in the codebase (ROUTE / TABLE / SERVICE / FLOW / ENTRY) into docs/onboard/INVENTORY.md. Triggered by /sdlc onboard --deep or invoked directly for inventory refresh.'
 agent: researcher
 ---
 

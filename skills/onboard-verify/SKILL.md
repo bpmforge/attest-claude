@@ -1,7 +1,7 @@
 ---
 name: Onboard Verify
 trigger: /onboard-verify
-description: 'Ralph Wiggum deep-onboard step D3 — run all onboard validators and report uncovered inventory rows. Thin wrapper over scripts/validators/validate-phase-gate.sh onboard-deep.'
+description: 'Ralph Wiggum deep-onboard: Step D3 — run all onboard validators and report uncovered inventory rows. Thin wrapper over scripts/validators/validate-phase-gate.sh onboard-deep.'
 agent: sdlc-lead
 ---
 

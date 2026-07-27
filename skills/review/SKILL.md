@@ -1,7 +1,7 @@
 ---
 name: Review
 trigger: /review
-description: Multi-pass code review with per-pass confidence scoring. Runs 4 parallel passes (security, performance, correctness, style), rates each 1-10, and only delivers a verdict when all 4 score ≥ 7.
+description: 'Multi-pass cross-expert review with per-pass confidence scoring — coordinates code-reviewer + security-auditor + performance-engineer in parallel, only delivers a verdict when all 3 score ≥ 7.'
 arguments:
   - name: target
     description: File, directory, or git diff to review

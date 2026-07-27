@@ -1,7 +1,7 @@
 ---
 name: Container Expert
 trigger: /containers
-description: 'Podman/Docker builds, Dockerfiles, compose, networking, image optimization. Use for container build/run failures or image tuning. NOT for deploy pipelines or monitoring — use /devops for those.'
+description: 'Runtime-aware container ops (Docker/Podman/Rancher-nerdctl/Finch) — builds, Dockerfiles, compose, networking, rootless debugging, image optimization, multi-arch, and cloud-portable images for GCP/AWS. Use for container build/run failures, image tuning, or cloud-readiness. NOT for deploy pipelines or monitoring — use /devops for those.'
 agent: container-ops
 arguments:
   - name: task
