@@ -79,4 +79,4 @@ Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and re
 
 ## License
 
-See `LICENSE`.
+[Apache License 2.0](LICENSE) — Copyright 2026 Bradford Matthews.
