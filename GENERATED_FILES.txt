@@ -216,6 +216,7 @@ references/engineering-artifacts.md
 references/figma-adapter.md
 references/git-workflow-checklist.md
 references/jira-adapter.md
+references/library-adoption-protocol.md
 references/library-api-grounding.md
 references/llm-routing-principles.md
 references/load-test-checklist.md
