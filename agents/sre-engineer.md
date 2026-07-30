@@ -248,8 +248,8 @@ The six canonical rules live in `~/.claude/agents/shared/BOUNDED_TASK_CONTRACT.m
 
 **Post-HANDOFF gates (automated — run by sdlc-lead via `~/.claude/scripts/validators/run-handoff-gates.sh`):**
 
-- `scripts/validators/validate-scope.sh` — git writes confined to assigned dir(s)
-- `scripts/validators/validate-completion-manifest.sh` — manifest schema + completion phrase
+- `~/.claude/scripts/validators/validate-scope.sh` — git writes confined to assigned dir(s)
+- `~/.claude/scripts/validators/validate-completion-manifest.sh` — manifest schema + completion phrase
 - *(no domain coverage validator — this agent produces artifacts not checked by a validator; the scope + manifest gates still apply)*
 
 Any gate failure returns your HANDOFF with REVISE status; re-run with the specific gap closed.
@@ -304,7 +304,7 @@ Per Rule 6 of `agents/shared/BOUNDED_TASK_CONTRACT.md`:
 
 **Run the validator:**
 ```bash
-bash scripts/validators/validate-infrastructure.sh .
+bash ~/.claude/scripts/validators/validate-infrastructure.sh .
 ```
 
 **For IaC scaffolding deliverables (Phase 4):**
@@ -317,7 +317,7 @@ bash scripts/validators/validate-infrastructure.sh .
 
 **Run the validator:**
 ```bash
-bash scripts/validators/validate-iac.sh .
+bash ~/.claude/scripts/validators/validate-iac.sh .
 ```
 If gaps reported → fix → re-run until exit 0.
 

@@ -255,9 +255,9 @@ The six canonical rules live in `~/.claude/agents/shared/BOUNDED_TASK_CONTRACT.m
 
 **Post-HANDOFF gates (automated — run by sdlc-lead via `~/.claude/scripts/validators/run-handoff-gates.sh`):**
 
-- `scripts/validators/validate-scope.sh` — git writes confined to assigned dir(s)
-- `scripts/validators/validate-completion-manifest.sh` — manifest schema + completion phrase
-- `scripts/validators/validate-api-coverage.sh` — domain coverage (auto-run when relevant)
+- `~/.claude/scripts/validators/validate-scope.sh` — git writes confined to assigned dir(s)
+- `~/.claude/scripts/validators/validate-completion-manifest.sh` — manifest schema + completion phrase
+- `~/.claude/scripts/validators/validate-api-coverage.sh` — domain coverage (auto-run when relevant)
 
 Any gate failure returns your HANDOFF with REVISE status; re-run with the specific gap closed.
 
@@ -330,7 +330,7 @@ Per Rule 6 of `agents/shared/BOUNDED_TASK_CONTRACT.md`:
 
 **Run the coverage validator:**
 ```bash
-bash scripts/validators/validate-api-coverage.sh .
+bash ~/.claude/scripts/validators/validate-api-coverage.sh .
 ```
 If gaps reported → fix → re-run until exit 0.
 
