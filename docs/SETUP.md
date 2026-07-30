@@ -22,8 +22,8 @@ Optional but recommended:
 ## 2. Install
 
 ```bash
-git clone https://github.com/bpmforge/claude-experts.git ~/Code/claude-experts
-cd ~/Code/claude-experts
+git clone https://github.com/bpmforge/attest-claude.git ~/Code/attest-claude
+cd ~/Code/attest-claude
 ./install.sh
 ```
 

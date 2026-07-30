@@ -353,7 +353,7 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 
 ## Shared protocols
 
-Canonical reference files in `agents/shared/`. Single source of truth — `install.sh` symlinks them into `~/.claude/agents/shared/`, so an edit here applies to every Claude Code session immediately. (Keep the sibling [bpm-opencode-experts](https://github.com/bpmforge/bpm-opencode-experts) repo in sync when these change.)
+Canonical reference files in `agents/shared/`. Single source of truth — `install.sh` symlinks them into `~/.claude/agents/shared/`, so an edit here applies to every Claude Code session immediately. (Keep the sibling [attest](https://github.com/bpmforge/attest) repo in sync when these change.)
 
 | File | Purpose |
 |------|---------|

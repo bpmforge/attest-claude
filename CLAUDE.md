@@ -1,4 +1,4 @@
-# claude-experts
+# attest-claude
 
 Expert system for Claude Code. Contains subagent definitions, skill triggers, reference documents, and hooks.
 
@@ -6,7 +6,7 @@ Expert system for Claude Code. Contains subagent definitions, skill triggers, re
 
 `agents/`, `references/`, `scripts/validators/`, `dist/compact-agents/`,
 `scripts/build-agents.mjs`, and `scripts/run-plan.mjs` are **generated** from
-the canonical source in `../bpm-opencode-experts` by its
+the canonical source in `../attest` by its
 `npm run build:claude`. Do NOT edit those files here — edit the canonical
 source (or `build/overrides/claude/` for runtime-flavored docs) and rebuild.
 `GENERATED_FILES.txt` lists every generated file. Per-target files owned by

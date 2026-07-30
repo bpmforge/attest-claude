@@ -65,7 +65,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [1.14.0] — 2026-06-22
 
-### Added — anti-drift hardening (regenerated from canonical bpm-opencode-experts v1.14.0)
+### Added — anti-drift hardening (regenerated from canonical attest v1.14.0)
 - **G-A book-style code sizing:** `validate-file-size.sh` (configurable cap, language-aware, `.filesizeignore`) + `agents/shared/CODE_BOOK_PROTOCOL.md` (a file over cap becomes a directory: index/barrel + chapters) + PLAN-SHAPE in `MICRO_LOOP.md`. The old hardcoded H-02 (250) is consolidated into the single configurable gate.
 - **G-B no-reinvent guard:** `validate-no-reinvent.sh` (hard-fail edits to `GENERATED_FILES.txt`; warn on wholesale rewrites) + `BOUNDED_TASK_CONTRACT.md` Rule 9 (LOCATE before create — confirm an audit's "missing/wrong" claim with `ls`/`diff` first). Targets the Mode-4 overwrite class.
 
@@ -73,7 +73,7 @@ See the canonical CHANGELOG for the full drift taxonomy + design doc.
 
 ## [1.13.0] — 2026-06-22
 
-### Added — loop engineering (regenerated from canonical bpm-opencode-experts v1.13.0)
+### Added — loop engineering (regenerated from canonical attest v1.13.0)
 - **`agents/shared/MICRO_LOOP.md`** + a load-bearing micro-loop instruction in all **27 micro-agents** (security ×9, code-review ×8, performance ×6, onboard ×4): each runs a bounded `criterion → produce → self-verify → revise (≤2) → return` loop before its completion phrase, inside the macro coverage/fix loops.
 - **G1 independent verifier:** `MODEL_ADAPTER.md` § Maker/Verifier split (verifier ≠ maker; on Claude Code, dispatch the verify step as a Task subagent with a different/faster model). Referenced by GATE_SCORING Step 3 + FIX_VERIFY Step 4.
 - **G2 no-progress kill:** `run-coverage-loop.sh` gap-checksum stall detection → exit 3.
@@ -84,35 +84,35 @@ Generated content rebuilt via `npm run build:claude`; see canonical CHANGELOG fo
 
 ## [1.12.0] — 2026-06-11
 
-### Added (generated from bpm-opencode-experts v1.12.0 — backlog at ZERO)
+### Added (generated from attest v1.12.0 — backlog at ZERO)
 - 5 new specialist experts: cost-engineer (/cost), analytics-architect (/analytics), a11y-compliance (/a11y), data-steward (/data-governance), reliability-engineer (/reliability) — agents + references generated; the 5 skill triggers are hand-added per-target. 3 new validators (wcag-coverage, data-governance, resilience-patterns) wired into phase gates.
 - /steward distill — per-release distillation loop (telemetry + evals → evidence-cited prompt/rubric/exemplar updates).
 - frontend-design governance/component/token-sync sections; researcher Fact Bank wiring.
 
 ## [1.11.0] — 2026-06-11
 
-### Added (generated from bpm-opencode-experts v1.11.0)
+### Added (generated from attest v1.11.0)
 - `validate-api-consistency.sh` (openapi vs implemented routes, phase-4/5 gates) + phantom-UC hard gap in `validate-tests-mapping.sh`.
 
 ## [1.10.0] — 2026-06-11
 
-### Added (generated from bpm-opencode-experts v1.10.0)
+### Added (generated from attest v1.10.0)
 - 3 new Phase-3 validators (circular-deps, transitive boundaries, observability) wired into the phase-3 gate; BOUNDED_TASK_CONTRACT Rule 8 (failure & recovery); 4 reference guides (SRE cloud patterns, design-system trade-offs, phase completion checklists, validator performance); telemetry rows from the 2 standalone validators.
 
 ## [1.9.0] — 2026-06-11
 
-### Added (generated from bpm-opencode-experts v1.9.0)
+### Added (generated from attest v1.9.0)
 - Telemetry rows from validators (`_lib.sh` — 42 of 45 emit one verdict row per run) and `run-plan.mjs` (per-node actuals) into the audited project's `docs/work/telemetry.jsonl`; `scripts/telemetry-report.mjs` analyzes distributions. `EXPERTS_TELEMETRY=0` disables. (The real-token plugin hook is OpenCode-only — Claude Code's hook surface doesn't expose token usage.)
 
 ## [1.8.0] — 2026-06-11
 
-### Changed (generated from bpm-opencode-experts v1.8.0)
+### Changed (generated from attest v1.8.0)
 - `release-manager` checklist step 2b: when `evals/` exists, the deterministic eval suite gates the tag. (The eval suite itself — fixtures + runner — lives in the canonical opencode repo; it tests the shared agent corpus.)
 - Validator scripts marked executable by install.sh.
 
 ## [1.7.0] — 2026-06-11
 
-### Added — exemplar library (generated from bpm-opencode-experts v1.7.0)
+### Added — exemplar library (generated from attest v1.7.0)
 - `exemplars/` — one gold-standard instance per artifact type (ERD, sequence diagram, security finding, completion manifest, ADR, gap report), cross-domain so models copy structure, not content. `install.sh` symlinks them to `~/.claude/exemplars/`.
 - HANDOFF Context Packet template: `Exemplar` pointer line + `Memory slice` section + tier=small packet layout budget (≤1,200 tokens injected).
 
@@ -142,17 +142,17 @@ Generated content rebuilt via `npm run build:claude`; see canonical CHANGELOG fo
 
 ### Added
 - **Dead/unutilized code detection** (8th code-review dimension) — `dead-code-detector` specialist + `validate-dead-code.sh` gate: unimplemented stubs, never-called functions, unused exports, orphan files, disconnected pipelines, unreachable branches. Wired into phase-4/5 gates; review-code skill now 8 dimensions.
-- **Security reachability gate** — attack-chainer down-ranks vulns in dead code (two severity levels) and excludes them as chain entry points. Generated from canonical bpm-opencode-experts.
+- **Security reachability gate** — attack-chainer down-ranks vulns in dead code (two severity levels) and excludes them as chain entry points. Generated from canonical attest.
 
 ## [1.2.0] — 2026-06-10
 
 ### Changed
-- **agents/, references/, validators, compact variants, and shared tooling are now GENERATED** from the canonical source in bpm-opencode-experts (`npm run build:claude` there). `GENERATED_FILES.txt` lists every generated file; `CLAUDE.md` documents per-repo ownership. This replaces the manual dual-repo sync rule with a verifiable drift gate (`build:claude:check`). The generation converged remaining prose divergence to canonical text; `agents/shared/EXECUTOR_SELECTION.md` and `RESEARCH_TOOLS.md` are Claude-flavored per-target overrides.
+- **agents/, references/, validators, compact variants, and shared tooling are now GENERATED** from the canonical source in attest (`npm run build:claude` there). `GENERATED_FILES.txt` lists every generated file; `CLAUDE.md` documents per-repo ownership. This replaces the manual dual-repo sync rule with a verifiable drift gate (`build:claude:check`). The generation converged remaining prose divergence to canonical text; `agents/shared/EXECUTOR_SELECTION.md` and `RESEARCH_TOOLS.md` are Claude-flavored per-target overrides.
 - New: `scripts/run-plan.mjs` — DAG runner for task-decomposer plans (see sibling CHANGELOG for details; on Claude Code use `--cmd` with a headless `claude -p`-based template, or execute plans via the Task tool).
 
 ## [1.1.0] — 2026-06-10
 
-Mirrors bpm-opencode-experts v1.1.0 (expert hardening R1–R11 + distribution hardening), adapted for the Claude Code runtime. See the sibling repo's CHANGELOG for the full R1–R11 detail.
+Mirrors attest v1.1.0 (expert hardening R1–R11 + distribution hardening), adapted for the Claude Code runtime. See the sibling repo's CHANGELOG for the full R1–R11 detail.
 
 ### Added
 - 8 new experts: task-decomposer, end-user-simulator, llm-integration-engineer, release-manager, and the `agents/game/` cluster (game-designer, gameplay-engineer, game-balance-designer, playtest-evaluator) + `--game` SDLC flavor.
@@ -184,8 +184,8 @@ Mirrors bpm-opencode-experts v1.1.0 (expert hardening R1–R11 + distribution ha
 ## [1.0.1] — 2026-06-02
 
 ### Fixed
-- `install.sh`: replaced with correct claude-experts installer (v1.0.0 had accidentally shipped the bpm-opencode-experts version)
-- `README.md`: was showing bpm-opencode-experts content; corrected to claude-experts
+- `install.sh`: replaced with correct attest-claude installer (v1.0.0 had accidentally shipped the attest version)
+- `README.md`: was showing attest content; corrected to attest-claude
 
 ### Changed
 - **`claude-memory` renamed → `bpm-memory-mcp`** — LLM-agnostic naming, matches `bpm-*` convention. Repo: `github.com/bpmforge/bpm-memory-mcp`
@@ -371,7 +371,7 @@ Full-lifecycle quality enforcement — traceability chain from requirements to p
 
 ## [0.23.0] — 2026-05-04
 
-Tiered research architecture — researcher now uses a mandatory tool selection gate and a 4-tier fallback chain that starts with fast pullmd-backed tools and escalates to Playwright only when needed. Synced from playwright-search v0.2.0 and claude-experts v0.18.0.
+Tiered research architecture — researcher now uses a mandatory tool selection gate and a 4-tier fallback chain that starts with fast pullmd-backed tools and escalates to Playwright only when needed. Synced from playwright-search v0.2.0 and attest-claude v0.18.0.
 
 ### Changed
 
@@ -1043,10 +1043,10 @@ Initial public release of the BPM OpenCode Expert system.
 - **6 reference documents** covering OWASP, engineering artifacts, REST APIs, Playwright, Semgrep, severity matrices.
 - **Install scripts** for global (`~/.config/opencode/`) or project-level setup.
 - **Full documentation**: expert guide, SDLC guide, contributing guide.
-- **Interoperable** with the sibling `claude-experts` project for Claude Code — works with any LLM backend (Claude, OpenAI, Gemini, Ollama, LM Studio, 75+ providers).
+- **Interoperable** with the sibling `attest-claude` project for Claude Code — works with any LLM backend (Claude, OpenAI, Gemini, Ollama, LM Studio, 75+ providers).
 
-[0.7.0]: https://github.com/bpmforge/bpm-opencode-experts/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/bpmforge/bpm-opencode-experts/compare/v0.5.0...v0.6.0
-[0.3.0]: https://github.com/bpmforge/bpm-opencode-experts/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/bpmforge/bpm-opencode-experts/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/bpmforge/bpm-opencode-experts/releases/tag/v0.1.0
+[0.7.0]: https://github.com/bpmforge/attest/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/bpmforge/attest/compare/v0.5.0...v0.6.0
+[0.3.0]: https://github.com/bpmforge/attest/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/bpmforge/attest/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/bpmforge/attest/releases/tag/v0.1.0

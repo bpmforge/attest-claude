@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Uninstall claude-experts from ~/.claude/
+# Uninstall attest-claude from ~/.claude/
 #
 # Removes symlinks and copies created by install.sh.
 # Does NOT remove settings.json hooks or CLAUDE.md sections —
@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_HOME="$HOME/.claude"
 
 echo ""
-echo "Uninstalling claude-experts..."
+echo "Uninstalling attest-claude..."
 echo ""
 
 # ─── 1. Remove agent symlinks ───

@@ -119,7 +119,7 @@ step 9 reminds you), on a cloud-tier model.
 ```
 ▶ Phase 3: Apply + verify
 ```
-4. Make the edits in the CANONICAL repo (bpm-opencode-experts), one commit per
+4. Make the edits in the CANONICAL repo (attest), one commit per
    agent touched, each commit message citing the evidence row.
 5. Re-run `npm run evals` (deterministic) — protocol edits must not regress
    the golden tasks. If agent-mode eval data motivated a change, re-run that

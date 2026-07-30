@@ -71,7 +71,7 @@ If community rules are missing, run `scripts/update-semgrep-rules.sh` to clone T
 
 > **Community rules canonical cache path:** `~/.semgrep/rules/{trailofbits,elttam,gitlab,0xdea}`. This is the path `scripts/semgrep-full-audit.sh` looks in. Always use `scripts/update-semgrep-rules.sh` to install rules — it clones to the canonical path. Do not clone rules anywhere else or the audit script won't find them.
 
-If custom rules are missing (`custom-rules-missing`), the 98 gap-filler rules were not installed. Re-run `install.sh` from the `claude-experts` repo. The rules are stored in the user's personal store at `~/.claude/.semgrep/` — **not** inside the project being audited.
+If custom rules are missing (`custom-rules-missing`), the 98 gap-filler rules were not installed. Re-run `install.sh` from the `attest-claude` repo. The rules are stored in the user's personal store at `~/.claude/.semgrep/` — **not** inside the project being audited.
 
 > **Custom rules personal store paths:**
 > - **Global install:** `~/.claude/.semgrep/custom-rules/` — 5 language rulesets (Kotlin, Swift, Rust, PHP, C#)

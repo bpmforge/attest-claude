@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install claude-experts globally for all Claude Code sessions
+# Install attest-claude globally for all Claude Code sessions
 #
 # Symlinks agents, skills, hooks, and references into ~/.claude/
 # so they're available in every project. Edits to this repo
@@ -19,8 +19,8 @@ case "$(uname -s)" in
     echo "  https://learn.microsoft.com/en-us/windows/wsl/install" >&2
     echo "" >&2
     echo "Then from inside WSL:" >&2
-    echo "  git clone https://github.com/bpmforge/claude-experts.git" >&2
-    echo "  cd claude-experts && ./install.sh" >&2
+    echo "  git clone https://github.com/bpmforge/attest-claude.git" >&2
+    echo "  cd attest-claude && ./install.sh" >&2
     exit 2
     ;;
   *)
@@ -143,7 +143,7 @@ for arg in "$@"; do
     --no-code-search)       INSTALL_CODE_SEARCH=false ;;
     --yes|-y)               INTERACTIVE=false ;;  # accept all defaults non-interactively
     --help|-h)
-      echo "claude-experts — Installation"
+      echo "attest-claude — Installation"
       echo ""
       echo "Usage:"
       echo "  ./install.sh                 Interactive — prompts for optional MCPs"
@@ -160,7 +160,7 @@ done
 # ─── Interactive prompts (when run with no flags from a terminal) ───
 if [ $# -eq 0 ] && [ -t 0 ]; then
   echo ""
-  echo "claude-experts v1.4.0 — Installation"
+  echo "attest-claude v1.4.0 — Installation"
   echo "====================================="
   echo ""
   echo "Core install (always): agents, skills, shared protocols, hooks, scripts, semgrep rules"
@@ -189,7 +189,7 @@ if [ $# -eq 0 ] && [ -t 0 ]; then
 fi
 
 echo ""
-echo "Installing claude-experts..."
+echo "Installing attest-claude..."
 echo "Source: $SCRIPT_DIR"
 echo "Target: $CLAUDE_HOME"
 echo ""

@@ -1,16 +1,16 @@
-# claude-experts
+# attest-claude
 
 Expert agent system for [Claude Code](https://claude.ai/code) — 39 primary expert agents + 31 cluster specialists (security, code-review, performance, onboarding, game dev), 27 skills, a 4-mode SDLC workflow, full git lifecycle management, and 55 automated validators that enforce quality gates at every phase.
 
 **Not sure which command to run? Just describe your goal:** `/guide` is the front door — it routes any plain-English goal ("securely check all my source and help fix the issues", "this codebase is unfamiliar", "harden before launch") to the right expert and drives the workflow, always offering the next step.
 
-Sibling project: [`bpm-opencode-experts`](https://github.com/bpmforge/bpm-opencode-experts) — same experts for OpenCode (any LLM). This repo's agents, references, and validators are generated from it.
+Sibling project: [`attest`](https://github.com/bpmforge/attest) — same experts for OpenCode (any LLM). This repo's agents, references, and validators are generated from it.
 
 ## Install
 
 ```bash
-git clone https://github.com/bpmforge/claude-experts.git
-cd claude-experts
+git clone https://github.com/bpmforge/attest-claude.git
+cd attest-claude
 ./install.sh
 ```
 

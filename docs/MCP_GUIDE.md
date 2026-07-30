@@ -1,6 +1,6 @@
 # MCP Configuration Guide
 
-How to install, configure, and use each MCP server in the expert system. For the full catalog of what each MCP provides, see [FEATURES.md](FEATURES.md). OpenCode users: see the sibling repo [bpm-opencode-experts](https://github.com/bpmforge/bpm-opencode-experts).
+How to install, configure, and use each MCP server in the expert system. For the full catalog of what each MCP provides, see [FEATURES.md](FEATURES.md). OpenCode users: see the sibling repo [attest](https://github.com/bpmforge/attest).
 
 ---
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# ci-check.sh — static self-check for the claude-experts distribution repo.
+# ci-check.sh — static self-check for the attest-claude distribution repo.
 #
 # This repo has no npm test / build step of its own (agents/skills/scripts
-# are either GENERATED from bpm-opencode-experts or per-target content —
+# are either GENERATED from attest or per-target content —
 # see GENERATED_FILES.txt). What CAN regress here without any framework
 # catching it: a broken shell script, a broken mjs script, or a
 # GENERATED_FILES.txt entry pointing at a file that no longer exists.

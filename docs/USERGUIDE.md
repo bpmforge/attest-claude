@@ -1,6 +1,6 @@
 # User Guide
 
-How to use the Claude Code expert system. For *what* each expert is, see [FEATURES.md](FEATURES.md). OpenCode users: see the sibling repo [bpm-opencode-experts](https://github.com/bpmforge/bpm-opencode-experts).
+How to use the Claude Code expert system. For *what* each expert is, see [FEATURES.md](FEATURES.md). OpenCode users: see the sibling repo [attest](https://github.com/bpmforge/attest).
 
 ## Table of contents
 
@@ -32,8 +32,8 @@ How to use the Claude Code expert system. For *what* each expert is, see [FEATUR
 ## Install
 
 ```bash
-git clone https://github.com/bpmforge/claude-experts.git
-cd claude-experts
+git clone https://github.com/bpmforge/attest-claude.git
+cd attest-claude
 ./install.sh                          # interactive — prompts for optional MCPs
 ./install.sh --yes                    # accept all defaults (non-interactive)
 ./install.sh --no-memory             # skip bpm-memory-mcp
