@@ -162,7 +162,7 @@ If 3 consecutive successful calls produce nothing new, the work-unit is **as ans
 ## Retry budgets — four counters, not one
 
 **A tooling mistake must not consume a code-fix attempt.** Field trace 2026-07
-(marauder): a fence ran `pnpm biome check scripts/conductor` against a config that
+(downstream project): a fence ran `pnpm biome check scripts/conductor` against a config that
 excludes `scripts/`. The agent burned attempts on an invocation defect it could
 not fix, hit the single 3-strike cap, and stopped with the implementation
 finished and unreported. One counter cannot tell "I typed the command wrong" from

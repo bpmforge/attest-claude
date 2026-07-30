@@ -29,7 +29,7 @@
  * the denominator rather than silently counted as successes.
  *
  * LEAD-FIXED is a correction too, and it is the one this metric was blindest to.
- * Field trace 2026-07 (marauder): the lead repeatedly closed a specialist's gaps
+ * Field trace 2026-07 (downstream project): the lead repeatedly closed a specialist's gaps
  * itself — "I already know exactly what's needed and it's mechanical, I'll close
  * these directly rather than a round-trip", "~90% correct though — I'll finish
  * the small remaining gaps directly rather than risk another confused

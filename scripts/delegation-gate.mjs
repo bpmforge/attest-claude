@@ -218,7 +218,7 @@ function citations(file, ref) {
 
 // ── finding grounding ──────────────────────────────────────────────────────
 // Two ways a reviewer raises a finding that should never have been raised.
-// Field trace 2026-07 (marauder), both from one review:
+// Field trace 2026-07 (downstream project), both from one review:
 //
 //   F. A requirement asserted by ANALOGY. The reviewer claimed setPinned needed a
 //      system-snapshot guard at 90% confidence. The lead read the SRS: FR-VER-07

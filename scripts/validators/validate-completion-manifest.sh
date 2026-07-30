@@ -202,7 +202,7 @@ fi
 # -- 2b/2c. The cited evidence must not CONTRADICT the claim -----------------
 # v2 closed "you cited nothing" and "you cited something that isn't there". It
 # left open the more expensive failure: citing a real artifact that says the
-# OPPOSITE of the claim. Field trace 2026-07 (marauder), caught by hand three
+# OPPOSITE of the claim. Field trace 2026-07 (downstream project), caught by hand three
 # times in one project:
 #   * a report claiming `npx tsc --noEmit` -> "no TypeScript errors" when a
 #     re-run showed 2 real errors,
