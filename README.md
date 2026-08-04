@@ -14,6 +14,28 @@ cd attest-claude
 ./install.sh
 ```
 
+That gives you **`main`** — the newest state, which can contain work landed since the last release.
+
+**To install a specific release instead** (pick the version from [Releases](https://github.com/bpmforge/attest-claude/releases)):
+
+```bash
+git clone --branch v3.1.25 --depth 1 https://github.com/bpmforge/attest-claude.git
+cd attest-claude
+./install.sh
+```
+
+Or, in a clone you already have:
+
+```bash
+git fetch --tags
+git checkout v3.1.25   # prints a "detached HEAD" notice — that is expected
+./install.sh
+```
+
+**`main` vs a tag:** `main` moves with every push; a tag (`v3.1.25`) always points at the same commit. Use a tag when you want a fixed state; use `main` for the newest work. The "detached HEAD" notice is normal and installing works fine — you only need a branch if you intend to edit: `git checkout -b my-fix v3.1.25`. Go back to the latest with `git checkout main && git pull`.
+
+This repo is generated from [attest](https://github.com/bpmforge/attest) and its tags track that repo's, so `v3.1.25` here is the Claude build of attest `v3.1.25`.
+
 Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and registers the MCP servers. Useful flags: `--yes` (non-interactive), `--compact` (compact agent variants for 32k local models), `--tools` (install the optional code-analysis tools — semgrep, knip, vulture, mmdc, …), `--no-memory`, `--no-code-search`, `--no-playwright-search`. Requires macOS, Linux, or WSL2.
 
 **Verify the install:**
@@ -23,7 +45,7 @@ Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and re
 ~/.claude/scripts/check-tools.sh    # which optional analysis tools are present (add: --install)
 ```
 
-**Update:** `git pull && ./install.sh --yes` (idempotent — agents are symlinks, most updates apply instantly), then `doctor.sh` again.
+**Update:** `git pull && ./install.sh --yes` (idempotent — agents are symlinks, most updates apply instantly), then `doctor.sh` again. If you installed a tag, `git pull` does nothing — checkout the newer tag instead: `git fetch --tags && git checkout v<newer> && ./install.sh --yes`.
 
 ## First command
 
@@ -75,7 +97,7 @@ Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and re
 - [docs/FEATURES.md](docs/FEATURES.md) — full agent, skill, validator, and protocol catalog
 - [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md) — MCP configuration (`claude mcp add` / `.mcp.json`)
 - [docs/SDLC_GUIDE.md](docs/SDLC_GUIDE.md) — SDLC workflow, phases, git model
-- [CHANGELOG.md](CHANGELOG.md) — release notes
+- [Releases](https://github.com/bpmforge/attest-claude/releases) — release notes for each version (the per-release detail lives in the annotated tag; `CHANGELOG.md` covers 1.x only)
 
 ## License
 
