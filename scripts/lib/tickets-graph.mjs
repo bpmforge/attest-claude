@@ -55,6 +55,52 @@ export function validatePlan(plan) {
     if (!Array.isArray(m.depends_on)) errors.push(`${where}: depends_on must be an array`);
     if (!STATUSES.includes(m.status)) errors.push(`${where}: status '${m.status}' not one of ${STATUSES.join('|')}`);
     if (m.owner != null && typeof m.owner !== 'string') errors.push(`${where}: owner must be a string or null`);
+    // `manifest` is a PATH and `verify` is a COMMAND — both strings, both
+    // consumed by close() as `resolve(cwd, m.manifest)` and a shell command.
+    // Neither was type-checked here, so a board could validate perfectly clean
+    // and then crash the lifecycle: resolve() throws ERR_INVALID_ARG_TYPE on a
+    // non-string, which surfaces as a stack trace rather than a refusal naming
+    // the ticket. Observed 2026-07-31 — an SDLC-generated board described the
+    // manifest as a rich object ({files, exports, tests}), which reads as a
+    // sensible interpretation of the word and is unusable as a path.
+    //
+    // Checked only WHEN PRESENT: docs/TICKET_SCHEMA.md makes `manifest`
+    // "required for close", not required to exist, and close() already refuses
+    // clearly when it is absent. Requiring it here would invalidate boards
+    // that are legitimately mid-draft.
+    if (m.manifest !== undefined && (typeof m.manifest !== 'string' || !m.manifest.trim())) {
+      errors.push(`${where}: manifest must be a non-empty string path to the Completion Manifest (got ${Array.isArray(m.manifest) ? 'array' : typeof m.manifest})`);
+    } else if (typeof m.manifest === 'string' && m.manifest.trim()) {
+      // A string is not enough — the path has to point at a DOCUMENT, because
+      // the executor instructs its session to "Write a Completion Manifest at
+      // <module.manifest>". Point it at a source file and the agent dutifully
+      // overwrites that file with markdown: the ticket's own code or test is
+      // destroyed, and `verify` then runs node --test against a markdown file.
+      // The failure does not look like a bad path; it looks like the agent
+      // wrecking its own deliverable. Observed 2026-07-31 — an SDLC board set
+      // manifest to `tests/parse.test.js`, a file the same ticket had to
+      // create, after a type-only check let the agent pick the nearest string
+      // it had.
+      if (!/\.md$/i.test(m.manifest.trim()))
+        errors.push(`${where}: manifest must be a .md document (conventionally docs/reviews/MANIFEST_${m.id}.md) — the executor WRITES the Completion Manifest to this path, so a non-document path is overwritten`);
+      // NOTE: whether the manifest sits somewhere the SCOPE GATE allows is a
+      // conductor-specific constraint, not a schema one, and it is checked in
+      // conductor.mjs (G6) rather than here. validatePlan serves every caller,
+      // including a human driving the lifecycle by hand with a `manifest.md`
+      // at the project root — perfectly valid, no scope gate involved. Making
+      // it a schema error broke 19 lifecycle tests; the tests were right.
+      const scope = Array.isArray(m.write_scope) ? m.write_scope : [];
+      if (scope.some((s) => typeof s === 'string' && s.trim() === m.manifest.trim()))
+        errors.push(`${where}: manifest '${m.manifest}' is also in write_scope — the manifest is written to that path and would clobber the ticket's own deliverable`);
+    }
+    // `verify` is type-checked only. A BARE PATH is valid here and is in fact
+    // this repo's own convention — examples/tickets-plan.sample.json uses
+    // `scripts/validators/validate-migrations.sh`, and the ai-daytrader
+    // fixture uses `tests/unit/learning/test_pit_bars.py`. A rule rejecting
+    // single-token paths as "not a command" was tried and reverted: it failed
+    // six existing tests, because the premise was wrong, not the tests.
+    if (m.verify !== undefined && (typeof m.verify !== 'string' || !m.verify.trim()))
+      errors.push(`${where}: verify must be a non-empty string command (got ${Array.isArray(m.verify) ? 'array' : typeof m.verify})`);
     for (const nid of (m.nodes || [])) if (!nodeIds.has(nid)) errors.push(`${where}: references node '${nid}' not in plan.nodes`);
     // T29.2: stories[] is optional but, when present, must be a plain string
     // array — unlike `nodes`, it points at docs/USER_STORIES.md (an external
@@ -175,6 +221,53 @@ export function scopeCoverageWarnings(plan) {
       const covered = scopes.some(s => p === s || p.startsWith(s + '/'));
       if (!covered) out.push({ id: m.id, path: p, msg: `module '${m.id}': acceptance names '${p}' in its own area but no write_scope glob covers it` });
     }
+  }
+  return out;
+}
+
+// testSiblingWarnings: a ticket whose write_scope carries implementation files
+// but no test file cannot add tests without tripping the scope gate.
+//
+// The agent is asked for tests by its acceptance criteria and forbidden from
+// writing them by its write_scope, and the only honest moves left are to
+// self-block or to delete the tests it just wrote. Both have happened for real:
+// a downstream project's W6-01 ticket wrote five table-driven tests, verified
+// them, then deleted them rather than self-amend its own scope; and on 2026-07-31 an
+// SDLC-generated board here scoped `src/parse.js` alone while its acceptance
+// demanded tests — the session wrote 214 lines of them and lost the whole
+// attempt to "tests/parse.test.js written outside assigned scope".
+//
+// ADVISORY, not an error. examples/tickets-plan.sample.json has zero of five
+// modules with a test in scope, so gating on this would invalidate this repo's
+// own canonical board. (A stricter `verify`-shape rule was tried the same day
+// and reverted for exactly this reason — the fixtures encode the convention,
+// and a rule that fails them is usually wrong about the convention.)
+//
+// Same-directory, not exact-sibling naming: foo.test.js, foo.spec.ts,
+// foo_test.go and test_foo.py are all legitimate layouts, and demanding one
+// filename produces false warnings on real trees.
+const TEST_PATH_RE = /(^|\/)(tests?|__tests__|spec)\//i;
+const TEST_FILE_RE = /((\.|_|-)(test|spec)s?\.[a-z]+$)|((^|\/)test_[^/]+$)|(_test\.[a-z]+$)|(Test\.[a-z]+$)/i;
+const SOURCE_FILE_RE = /\.(js|mjs|cjs|jsx|ts|tsx|py|go|rs|rb|java|kt|swift|php|cs|scala)$/i;
+
+export function testSiblingWarnings(plan) {
+  const out = [];
+  const isTest = (f) => TEST_PATH_RE.test(f) || TEST_FILE_RE.test(f);
+  const dirOf = (f) => f.slice(0, f.lastIndexOf('/') + 1);
+  for (const m of plan.modules || []) {
+    // A settled ticket's scope is history; warning on it every run buries the
+    // actionable ones (27 of 29 warnings on a real board).
+    if (m.status === 'done') continue;
+    const scope = (m.write_scope || []).filter((f) => typeof f === 'string');
+    // Glob scopes (`src/**`) already admit any test file under them.
+    const impl = scope.filter((f) => !f.includes('*') && SOURCE_FILE_RE.test(f) && !isTest(f));
+    if (!impl.length) continue;
+    const testDirs = new Set(scope.filter(isTest).map(dirOf));
+    const globDirs = scope.filter((f) => f.includes('*')).map((f) => f.slice(0, f.indexOf('*')));
+    const uncovered = impl.filter((f) =>
+      !testDirs.has(dirOf(f)) && !globDirs.some((g) => f.startsWith(g)));
+    if (uncovered.length)
+      out.push({ id: m.id, msg: `module '${m.id}': write_scope has implementation (${uncovered.join(', ')}) but no test file in the same directory — the agent cannot add tests for it without an out-of-scope gate failure` });
   }
   return out;
 }

@@ -250,6 +250,8 @@ scripts/lib/model-limits-sync.mjs
 scripts/lib/model-tiers.mjs
 scripts/lib/reconciliation-matrix.mjs
 scripts/lib/reflow-audit.mjs
+scripts/lib/review-triggers.mjs
+scripts/lib/runtime-verdict.mjs
 scripts/lib/session-receipt.mjs
 scripts/lib/status-report.mjs
 scripts/lib/ticket-hygiene.mjs
