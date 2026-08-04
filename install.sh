@@ -132,9 +132,11 @@ INSTALL_PLAYWRIGHT_MCP=true
 INSTALL_MEMORY=true
 INSTALL_CODE_SEARCH=true
 INTERACTIVE=false
+DO_UPDATE=false
 
 for arg in "$@"; do
   case $arg in
+    --update)               DO_UPDATE=true ;;
     --no-playwright-search) INSTALL_PWS=false ;;
     --no-playwright-mcp)    INSTALL_PLAYWRIGHT_MCP=false ;;
     --no-memory)            INSTALL_MEMORY=false ;;
@@ -147,6 +149,7 @@ for arg in "$@"; do
       echo ""
       echo "Usage:"
       echo "  ./install.sh                 Interactive — prompts for optional MCPs"
+      echo "  ./install.sh --update        Move this checkout to the newest release and reinstall"
       echo "  ./install.sh --yes           Accept all defaults (non-interactive)"
       echo "  ./install.sh --no-memory     Skip bpm-memory-mcp"
       echo "  ./install.sh --no-code-search  Skip bpm-code-search-mcp"
@@ -156,6 +159,67 @@ for arg in "$@"; do
       ;;
   esac
 done
+
+# ─── --update: move this checkout to the newest release, then reinstall ───
+# One command for "get me the latest and be done". Deliberately refuses rather
+# than guesses when the checkout is not in a safe state to move.
+if [ "$DO_UPDATE" = true ] && [ "${EXPERTS_SELF_UPDATED:-0}" != "1" ]; then
+  cd "$SCRIPT_DIR"
+
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "  ⚠️  --update needs a git checkout, and this directory has no git history."
+    echo "     (A downloaded .zip has no way to know what version it is.)"
+    echo "     Re-clone instead:  git clone https://github.com/bpmforge/attest-claude.git"
+    exit 1
+  fi
+
+  # Only TRACKED edits block: a checkout preserves untracked files, so install
+  # artifacts left lying here must not make --update work exactly once.
+  if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+    echo "  ⚠️  --update refused — you have uncommitted edits to tracked files:"
+    git status --short --untracked-files=no | head -n 10
+    echo ""
+    echo "     Updating would move you to another commit and lose them."
+    echo "     Commit, stash (git stash), or discard (git checkout -- .) first."
+    exit 1
+  fi
+
+  BEFORE="$(git describe --tags --always 2>/dev/null || echo 'unknown')"
+  echo "  Fetching releases..."
+
+  if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)" = "true" ]; then
+    git fetch --unshallow --tags --quiet 2>/dev/null || git fetch --tags --quiet || true
+  else
+    git fetch --tags --quiet || true
+  fi
+
+  LATEST="$(git tag -l 'v*' --sort=-v:refname | head -n 1)"
+  if [ -z "$LATEST" ]; then
+    echo "  ⚠️  no release tags found after fetching — leaving this checkout untouched."
+    echo "     Check the remote:  git remote -v"
+    exit 1
+  fi
+
+  if [ "$(git rev-parse HEAD)" = "$(git rev-parse "$LATEST^{commit}")" ]; then
+    echo "  Already on the latest release ($LATEST) — reinstalling to be sure."
+  else
+    echo "  Updating: $BEFORE → $LATEST"
+    if ! git checkout --quiet "$LATEST"; then
+      echo "  ⚠️  could not check out $LATEST — leaving this checkout untouched."
+      exit 1
+    fi
+  fi
+
+  # Re-exec so the NEWLY checked-out installer runs, not this (older) one.
+  PASSTHRU=()
+  for arg in "$@"; do
+    [ "$arg" = "--update" ] || PASSTHRU+=("$arg")
+  done
+  [ ${#PASSTHRU[@]} -eq 0 ] && PASSTHRU=(--yes)
+
+  export EXPERTS_SELF_UPDATED=1
+  exec "$SCRIPT_DIR/install.sh" "${PASSTHRU[@]}"
+fi
 
 # ─── Interactive prompts (when run with no flags from a terminal) ───
 if [ $# -eq 0 ] && [ -t 0 ]; then

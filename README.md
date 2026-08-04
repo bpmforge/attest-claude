@@ -45,7 +45,19 @@ Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and re
 ~/.claude/scripts/check-tools.sh    # which optional analysis tools are present (add: --install)
 ```
 
-**Update:** `git pull && ./install.sh --yes` (idempotent — agents are symlinks, most updates apply instantly), then `doctor.sh` again. If you installed a tag, `git pull` does nothing — checkout the newer tag instead: `git fetch --tags && git checkout v<newer> && ./install.sh --yes`.
+## Update
+
+One command, from your existing checkout:
+
+```bash
+./install.sh --update
+```
+
+It fetches releases, moves this checkout to the newest one, reinstalls, and tells you what it moved from and to. Works whether you're on `main` or pinned to an older tag, and it's safe to run when you're already current. Follow with `doctor.sh`.
+
+It stops without changing anything if you have uncommitted edits to tracked files, and shows you which — so it can't quietly discard your work. (Untracked files are left alone.)
+
+Prefer to track `main` by hand? `git pull && ./install.sh --yes` still works — but note `git pull` is a silent no-op if you're on a tag, which is exactly the trap `--update` avoids.
 
 ## First command
 
