@@ -488,5 +488,5 @@ Also run in parallel:
 ~/.claude/scripts/validators/validate-architecture.sh
 ~/.claude/scripts/validators/validate-erd-coverage.sh
 ~/.claude/scripts/validators/validate-sequence-coverage.sh
-~/.claude/scripts/validators/validate-phase-gate.sh onboard-deep
+~/.claude/scripts/validators/run-coverage-loop.sh onboard-deep   # the wrapper — counts iterations; never the bare gate
 ```
