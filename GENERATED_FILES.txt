@@ -246,8 +246,10 @@ scripts/delegation-gate.mjs
 scripts/delegation-metrics.mjs
 scripts/fix-verify.mjs
 scripts/gen-status-report.mjs
+scripts/lib/annotate.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
+scripts/lib/img-gate.mjs
 scripts/lib/jira-hygiene.mjs
 scripts/lib/lifecycle-outbox.mjs
 scripts/lib/model-limits-sync.mjs
@@ -258,6 +260,9 @@ scripts/lib/review-triggers.mjs
 scripts/lib/runtime-verdict.mjs
 scripts/lib/session-receipt.mjs
 scripts/lib/status-report.mjs
+scripts/lib/tests/annotate.test.mjs
+scripts/lib/tests/fixtures.mjs
+scripts/lib/tests/img-gate.test.mjs
 scripts/lib/ticket-hygiene.mjs
 scripts/lib/tickets-graph.mjs
 scripts/lib/tickets-lifecycle.mjs
