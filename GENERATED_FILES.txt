@@ -26,6 +26,7 @@ agents/content-designer.md
 agents/cost-engineer.md
 agents/data-steward.md
 agents/db-architect.md
+agents/design-iterator.md
 agents/design-system-lead.md
 agents/documentation-gap-finder.md
 agents/end-user-simulator.md
@@ -165,6 +166,7 @@ dist/compact-agents/content-designer.md
 dist/compact-agents/cost-engineer.md
 dist/compact-agents/data-steward.md
 dist/compact-agents/db-architect.md
+dist/compact-agents/design-iterator.md
 dist/compact-agents/design-system-lead.md
 dist/compact-agents/documentation-gap-finder.md
 dist/compact-agents/end-user-simulator.md
@@ -227,6 +229,7 @@ references/owasp-checklist.md
 references/parallel-worktree-agent-playbook.md
 references/phase-completion-checklist.md
 references/playwright-config.md
+references/real-browser-bridge.md
 references/report-template.md
 references/rest-api-checklist.md
 references/semgrep-community-rules.md
@@ -235,6 +238,7 @@ references/severity-matrix.md
 references/sre-cloud-patterns.md
 references/tracker-data-model-template.md
 references/validator-performance.md
+references/visual-design-loop.md
 references/wcag-audit-checklist.md
 scripts/api-surface.mjs
 scripts/build-agents.mjs
@@ -242,8 +246,10 @@ scripts/delegation-gate.mjs
 scripts/delegation-metrics.mjs
 scripts/fix-verify.mjs
 scripts/gen-status-report.mjs
+scripts/lib/annotate.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
+scripts/lib/img-gate.mjs
 scripts/lib/jira-hygiene.mjs
 scripts/lib/lifecycle-outbox.mjs
 scripts/lib/model-limits-sync.mjs
@@ -254,6 +260,9 @@ scripts/lib/review-triggers.mjs
 scripts/lib/runtime-verdict.mjs
 scripts/lib/session-receipt.mjs
 scripts/lib/status-report.mjs
+scripts/lib/tests/annotate.test.mjs
+scripts/lib/tests/fixtures.mjs
+scripts/lib/tests/img-gate.test.mjs
 scripts/lib/ticket-hygiene.mjs
 scripts/lib/tickets-graph.mjs
 scripts/lib/tickets-lifecycle.mjs

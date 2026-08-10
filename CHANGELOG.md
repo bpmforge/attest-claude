@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.4.0] — 2026-08-10
+
+### Added — visual design loop (regenerated from canonical v3.4.0)
+- `/design-iterate` skill (hand-authored twin) + `design-iterator` agent — render → screenshot (375/768/1440) → token-lint + vision critique vs `docs/design/tokens.json` → fix → re-verify, cap 3 iterations; `--sync` token-baseline extraction; `--real` logged-in-browser audit (findings only).
+- `references/visual-design-loop.md` (protocol; tool table verified against @playwright/mcp 0.0.79 — snapshot-ref API) and `references/real-browser-bridge.md` (persistent profile / `--storage-state` / official `--extension` mode / `--cdp-endpoint` / claude-in-chrome tiers, plus the T5 build-our-own blueprint).
+- Design-chain wiring regenerated: sdlc-lead roster/table carry `design-iterator`; Phase 3 UX HANDOFF requests ux-engineer's `--auto` chain when `flows.md`/`tokens.json` are missing; Phase 4 Round 3b visual conformance after RUNTIME PASS.
+- `scripts/lib/img-gate.mjs` + `scripts/lib/annotate.mjs` now ship in this target (guide-scribe's reference was previously dangling here). They require `sharp` + `pixelmatch` available in the consuming project (`npm i -D sharp pixelmatch`).
+
 ## [1.26.3] — 2026-07-01
 
 ### Fixed — slash-wiring audit (regenerated from canonical v1.26.3)
