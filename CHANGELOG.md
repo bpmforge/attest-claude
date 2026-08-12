@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.5.0] — 2026-08-11
+
+### Added — gauntlet loop (regenerated from canonical v3.5.0)
+- `/gauntlet` skill (hand-authored twin) + `gauntlet-lead` agent — LEAD sets a real reference bar and budget, splits the goal into gradeable units, dispatches builders (clean context) and blind fresh-per-round critics (artifact + bar + exemplar only), loops until all-pass / two-round stall / budget; below-bar residuals always reported. No named exemplar → `BLOCKED: no real bar`.
+- `agents/shared/GAUNTLET_LOOP.md` — blindness rules, bar discipline, exit rules, and boundaries vs challenger / Fix-Verify / Wiggum coverage / design-iterator.
+- Routing regenerated: sdlc-lead agent table + design-iterator recommend row.
+
 ## [3.4.0] — 2026-08-10
 
 ### Added — visual design loop (regenerated from canonical v3.4.0)

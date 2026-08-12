@@ -40,6 +40,7 @@ agents/game/gameplay-engineer.md
 agents/game/level-designer.md
 agents/game/narrative-designer.md
 agents/game/playtest-evaluator.md
+agents/gauntlet-lead.md
 agents/git-expert.md
 agents/guide-scribe.md
 agents/guide.md
@@ -107,6 +108,7 @@ agents/shared/FIX_VERIFY_LOOP.md
 agents/shared/GAME_PRODUCTION.md
 agents/shared/GAME_TOOLING.md
 agents/shared/GATE_SCORING_PROTOCOL.md
+agents/shared/GAUNTLET_LOOP.md
 agents/shared/GUIDE_CAPTURE.md
 agents/shared/HANDOFF_QUICK_REF.md
 agents/shared/HANDOFF_TEMPLATES.md
@@ -171,6 +173,7 @@ dist/compact-agents/design-system-lead.md
 dist/compact-agents/documentation-gap-finder.md
 dist/compact-agents/end-user-simulator.md
 dist/compact-agents/frontend-design.md
+dist/compact-agents/gauntlet-lead.md
 dist/compact-agents/git-expert.md
 dist/compact-agents/guide-scribe.md
 dist/compact-agents/guide.md
