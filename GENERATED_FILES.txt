@@ -260,6 +260,7 @@ scripts/lib/model-tiers.mjs
 scripts/lib/reconciliation-matrix.mjs
 scripts/lib/reflow-audit.mjs
 scripts/lib/review-triggers.mjs
+scripts/lib/rules.mjs
 scripts/lib/runtime-verdict.mjs
 scripts/lib/session-receipt.mjs
 scripts/lib/status-report.mjs
@@ -269,6 +270,7 @@ scripts/lib/tests/img-gate.test.mjs
 scripts/lib/ticket-hygiene.mjs
 scripts/lib/tickets-graph.mjs
 scripts/lib/tickets-lifecycle.mjs
+scripts/lib/tickets-seams.mjs
 scripts/lib/tickets.mjs
 scripts/lib/tracker-model.mjs
 scripts/lib/user-stories.mjs
@@ -337,7 +339,9 @@ scripts/validators/validate-release-readiness.sh
 scripts/validators/validate-requirement-closure.sh
 scripts/validators/validate-requirements-matrix.sh
 scripts/validators/validate-resilience-patterns.sh
+scripts/validators/validate-rules.sh
 scripts/validators/validate-scope.sh
+scripts/validators/validate-seams.sh
 scripts/validators/validate-security-controls.sh
 scripts/validators/validate-sequence-coverage.sh
 scripts/validators/validate-smoke.sh

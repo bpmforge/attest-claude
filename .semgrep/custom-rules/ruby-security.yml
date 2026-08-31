@@ -115,7 +115,7 @@ rules:
       via YAML tags. Use `YAML.safe_load()` which only permits basic types.
     patterns:
       - pattern: YAML.load($INPUT)
-      - pattern-not: YAML.load($INPUT, permitted_classes: ...)
+      - pattern-not: 'YAML.load($INPUT, permitted_classes: ...)'
     metadata:
       cwe: ["CWE-502"]
       owasp: ["A08:2021"]

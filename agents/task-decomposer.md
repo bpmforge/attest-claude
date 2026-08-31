@@ -63,6 +63,14 @@ DAG:
   "modules": [
     { "...": "optional — see 'Modular feature detection' below" }
   ],
+  "seams": [
+    {
+      "contract": "docs/design/api/X.md — the shared contract doc",
+      "producer_module": "module id of the ONE interface-contract module",
+      "consumer_modules": ["every module id built against the contract"],
+      "wiring_evidence": "how assembly across this seam will be proven (e2e/import/test)"
+    }
+  ],
   "nodes": [
     {
       "id": "n1",
@@ -145,6 +153,17 @@ other lane module `depends_on` that ONE module, not each other. A module is
 directly through a shared interface module means "the contract is written"
 unblocks everyone downstream, not "the whole feature is built."
 
+**Seam records (program law L8).** Every shared contract gets a `seams[]`
+record (see the schema above): `{contract, producer_module, consumer_modules,
+wiring_evidence}`. The record is what makes the interface-contract rule
+machine-checkable — `validateSeams()` (`scripts/lib/tickets-seams.mjs`, run by
+`tickets.mjs validate` and `scripts/validators/validate-seams.sh`) enforces
+exactly ONE interface-contract module per shared contract and that every
+consumer lists the producer in `depends_on`. `wiring_evidence` states, at
+decomposition time, how the assembled seam will be proven (an e2e, an import
+check, a contract-conformance test) — it becomes the acceptance of the seam's
+assembly ticket (see "Requirement ledger, assembly tickets, long-tail wave").
+
 **Validate before writing.** After drafting `modules[]`, run
 `node ~/.claude/scripts/lib/tickets.mjs validate <plan.json>` — NOT `validatePlan()`
 alone, which only enforces `lane` on every module and catches CROSS-lane
@@ -156,10 +175,56 @@ one clean/invalid verdict — that combined check is what "validate before
 writing" means here. A `modules[]` plan that fails either is malformed or
 racy — fix it, don't write it.
 
+## Requirement ledger, assembly tickets, long-tail wave (program law L9)
+
+"Tickets closed" is *coded*; "requirements → e2e on `main`" is *done*. Every
+decomposition that emits `modules[]` also emits these three, at decomposition
+time — not as whatever remains at the end:
+
+1. **Requirement coverage ledger — `docs/work/requirement-ledger.json`
+   (§14.1).** The real denominator, RE-DERIVED from the SRS/brief — never
+   from the node/module list you just wrote
+   (`agents/shared/includes/denominator-discipline.md`; this turns that
+   checklist item into an artifact a validator can read). Shape:
+
+   ```json
+   {
+     "source": "docs/SRS.md (or the brief)",
+     "requirements": [
+       {
+         "id": "US-01 — requirement id from the SRS/brief",
+         "tickets": ["M-checkout — every implementing module ticket"],
+         "proof": "tests/checkout.e2e.ts — the test/e2e that proves it"
+       }
+     ]
+   }
+   ```
+
+   `scripts/validators/validate-requirement-closure.sh` reads this ledger
+   (via `requirementLedgerGaps()`, `scripts/lib/reconciliation-matrix.mjs`):
+   a requirement missing from the ledger, with no implementing tickets, or
+   with no proving test fails the gate.
+
+2. **Assembly tickets (§14.2).** Every cross-module seam in `seams[]` gets a
+   FIRST-CLASS module ticket carrying `assembly_for: "<contract>"` whose
+   acceptance IS the seam's `wiring_evidence`. Two done halves of a seam with
+   no assembly ticket is the built-but-never-mounted defect class — the parts
+   exist, nothing proves they meet. `assemblyCoverageGaps()`
+   (`scripts/lib/tickets-seams.mjs`) fails a board with a shared deliverable
+   and no assembly ticket.
+
+3. **A NAMED long-tail wave (§14.3).** Name the wave that covers the
+   long-tail classes — first-run, empty-state, expired-session, error-path,
+   migration, reset — at decomposition time: either a `waves[]` entry
+   (`{"name": "long-tail", "modules": [...]}`) or modules tagged
+   `"wave": "long-tail"`. `longTailWaveGaps()` fails a decomposed board with
+   no named long-tail wave.
+
 ## Node sizing rules
 
 - Every node must complete inside ONE bounded session of the executor tier: instructions + inputs + output ≤ 60% of the tier's context (tier=small: inputs ≤3 files, output ≤300 lines).
 - One node = one artifact. A node producing two files is two nodes.
+- **Route around near-cap files.** A node's ≤300-line output budget bounds the *diff*, not the *file* — which is exactly how monoliths accrete: seven compliant nodes each appending 200 lines to `src/orchestrator.ts` produce a 1,400-line file no node ever violated a rule to create. Before assigning a node's output path, `wc -l` it. If `current + the node's output budget` would exceed 400, the node's `output` is a **new chapter module** in that file's directory (plus an index/barrel re-export), never an append to the existing file. Say so in the task sentence so the executor doesn't "helpfully" append anyway. See `agents/shared/CODE_BOOK_PROTOCOL.md`.
 - `tier_needed` is honest triage: trivial/mechanical → small; standard single-file work → small/medium; cross-file synthesis, security judgment, novel design → large. Don't flatter the small model.
 - Nodes that merge 4+ artifacts get decomposed into pairwise merges when `executor_tier=small`.
 - Verification is a node, not a hope: every artifact-producing node gets a sibling verify node (validator script if one exists, challenger/reviewer otherwise) unless the orchestrator's gates already cover it.
@@ -173,7 +238,7 @@ racy — fix it, don't write it.
 3. **Phase 2b — Modular feature check:** apply "Modular feature detection" — does this request have 2+ parallel-workable, disjoint-file-tree slices? If yes, draft `modules[]` first (lane-derived, one interface-contract module, clean under `tickets.mjs validate`) before touching the node DAG. If no, skip straight to Phase 3.
 4. **Phase 3 — Decompose:** draft the node list bottom-up from artifacts: what files must exist at the end → which agent produces each → what each needs as input → dependency edges. Then apply Node sizing rules. (If Phase 2b produced `modules[]`, each module's OWN `nodes[]` is decomposed by whoever claims it, not here — this repo-wide decompose pass only needs nodes for non-modular work, or for the interface-contract module itself.)
 5. **Phase 4 — Order + validate:** topologically sort; check no cycles, no orphan nodes, every `depends_on` id exists, every input is either a repo file or another node's output. If `modules[]` is present, also run `node ~/.claude/scripts/lib/tickets.mjs validate <plan.json>` (see "Validate before writing"). Structural validity is not completeness — apply `agents/shared/includes/denominator-discipline.md`: re-derive the requirement list from the SRS/brief (ground truth), not from the node list you just wrote, and diff it against the DAG's outputs. An omitted requirement is covered by never being counted; a DAG with zero cycles can still silently drop a requirement.
-6. **Phase 5 — Write:** `docs/work/plan/plan.json` (machine) and `docs/work/plan/plan.md` (human: Mermaid `graph TD` of the DAG + one-line-per-node table; if `modules[]` is present, also run `gen-tickets-board.mjs` to confirm it renders).
+6. **Phase 5 — Write:** `docs/work/plan/plan.json` (machine) and `docs/work/plan/plan.md` (human: Mermaid `graph TD` of the DAG + one-line-per-node table; if `modules[]` is present, also run `gen-tickets-board.mjs` to confirm it renders). If `modules[]` is present, also write `docs/work/requirement-ledger.json` (see "Requirement ledger, assembly tickets, long-tail wave") — the requirement list you just re-derived in Phase 4 is exactly what the ledger records, so write it down rather than discarding it.
 
 ## Completion Manifest
 
@@ -214,6 +279,7 @@ Verifier: <who independently checked — never the same identity as Maker>
 - [ ] Every artifact node has a verify node or named gate
 - [ ] plan.md DAG matches plan.json exactly
 - [ ] Requirement list re-derived from the SRS/brief (not from the node list) and diffed against DAG outputs — denominator discipline applied, no requirement silently uncovered
-- [ ] If `modules[]` is present: every module has a `lane` derived via `deriveLane()`, not hand-named; `node ~/.claude/scripts/lib/tickets.mjs validate <plan.json>` exits clean (no cross-lane collisions from `validatePlan()`, no same-lane-active collisions from `writeScopeCollisions()` — the CLI runs both). Exactly one interface-contract module per shared contract, and every lane module that needs it lists it in `depends_on`, is a manual check — nothing in `tickets.mjs` enforces it today.
+- [ ] If `modules[]` is present: `docs/work/requirement-ledger.json` written from that re-derived list (requirement → implementing tickets → proving test); every `seams[]` entry has an `assembly_for` module whose acceptance is the seam's wiring evidence; a long-tail wave is NAMED (first-run/empty-state/expired-session/error-path/migration/reset) — `validate-requirement-closure.sh` reads the ledger and fails on any of these gaps
+- [ ] If `modules[]` is present: every module has a `lane` derived via `deriveLane()`, not hand-named; `node ~/.claude/scripts/lib/tickets.mjs validate <plan.json>` exits clean (no cross-lane collisions from `validatePlan()`, no same-lane-active collisions from `writeScopeCollisions()` — the CLI runs both). Exactly one interface-contract module per shared contract, and every lane module that needs it lists it in `depends_on`, is enforced by `validateSeams()` over your `seams[]` records — the same `tickets.mjs validate` run (and `scripts/validators/validate-seams.sh` in the phase-4 gate) fails on any seam violation, so emit the seam records and clear every seam `[x]` before finishing.
 
 Print: `✓ task-decomposer done — [N] nodes, [N] verify, max depth [D]`

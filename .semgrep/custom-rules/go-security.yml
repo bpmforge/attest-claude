@@ -143,7 +143,7 @@ rules:
       the connection is vulnerable to MITM attacks. Remove this flag;
       if testing with self-signed certs, use a custom `RootCAs` pool.
     patterns:
-      - pattern: tls.Config{..., InsecureSkipVerify: true, ...}
+      - pattern: 'tls.Config{..., InsecureSkipVerify: true, ...}'
     metadata:
       cwe: ["CWE-295"]
       owasp: ["A02:2021"]
@@ -320,7 +320,7 @@ rules:
       have no deadline and can hang indefinitely, exhausting goroutines.
       Set an explicit timeout: `&http.Client{Timeout: 30 * time.Second}`.
     patterns:
-      - pattern: &http.Client{}
+      - pattern: '&http.Client{}'
     metadata:
       cwe: ["CWE-400"]
       owasp: ["A05:2021"]
@@ -335,7 +335,7 @@ rules:
       cookie can be sent over HTTP and read by JavaScript. Always set
       both flags for session and auth cookies.
     patterns:
-      - pattern: http.Cookie{..., Secure: false, ...}
+      - pattern: 'http.Cookie{..., Secure: false, ...}'
     metadata:
       cwe: ["CWE-614", "CWE-1004"]
       owasp: ["A05:2021"]

@@ -63,9 +63,9 @@ rules:
       or replace with a safe query operator.
     patterns:
       - pattern-either:
-          - pattern: $COLLECTION.find({$where: $INPUT}, ...)
-          - pattern: $COLLECTION.findOne({$where: $INPUT}, ...)
-          - pattern: $COLLECTION.find({"$where": $INPUT}, ...)
+          - pattern: '$COLLECTION.find({$where: $INPUT}, ...)'
+          - pattern: '$COLLECTION.findOne({$where: $INPUT}, ...)'
+          - pattern: '$COLLECTION.find({"$where": $INPUT}, ...)'
     metadata:
       cwe: ["CWE-943"]
       owasp: ["A03:2021"]
@@ -105,10 +105,10 @@ rules:
       and pass arguments as an array.
     patterns:
       - pattern-either:
-          - pattern: spawn($CMD, $ARGS, {shell: true, ...})
-          - pattern: spawnSync($CMD, $ARGS, {shell: true, ...})
-          - pattern: spawn($CMD, $ARGS, {..., shell: true})
-          - pattern: spawnSync($CMD, $ARGS, {..., shell: true})
+          - pattern: 'spawn($CMD, $ARGS, {shell: true, ...})'
+          - pattern: 'spawnSync($CMD, $ARGS, {shell: true, ...})'
+          - pattern: 'spawn($CMD, $ARGS, {..., shell: true})'
+          - pattern: 'spawnSync($CMD, $ARGS, {..., shell: true})'
     metadata:
       cwe: ["CWE-78"]
       owasp: ["A03:2021"]
@@ -288,7 +288,7 @@ rules:
           - pattern: axios.post($URL, ...)
           - pattern: axios.put($URL, ...)
           - pattern: axios.delete($URL, ...)
-          - pattern: axios.request({url: $URL, ...})
+          - pattern: 'axios.request({url: $URL, ...})'
       - pattern-not: axios.get("...", ...)
       - pattern-not: axios.post("...", ...)
     metadata:
@@ -426,7 +426,7 @@ rules:
       the cookie can be sent over HTTP and read by JavaScript. Always
       set both flags for session and auth cookies.
     patterns:
-      - pattern: res.cookie($NAME, $VAL, {..., secure: false, ...})
+      - pattern: 'res.cookie($NAME, $VAL, {..., secure: false, ...})'
     metadata:
       cwe: ["CWE-614", "CWE-1004"]
       owasp: ["A05:2021"]

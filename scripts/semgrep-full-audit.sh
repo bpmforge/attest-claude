@@ -50,10 +50,39 @@ for arg in "$@"; do
 done
 
 # ── Preflight ──────────────────────────────────────────────────────────
-if ! command -v semgrep &> /dev/null; then
-  echo "❌ semgrep not installed."
-  echo "   brew install semgrep   (macOS)"
-  echo "   pip install semgrep    (any platform)"
+# ── Engine selection ───────────────────────────────────────────────────
+#
+# OPENGREP IS PREFERRED, AND THE REASON IS LICENSING. Semgrep's CLI moved off
+# a straightforward OSS licence, and its REGISTRY rules (every `p/...` pack)
+# carry the Semgrep Rules License, which restricts redistribution and use in
+# competing/commercial scanning. Opengrep is the LGPL fork of the engine and
+# carries no such restriction; the in-house bpm-rulepacks are ours outright.
+#
+# Set SAST_ENGINE=semgrep to override deliberately.
+ENGINE="${SAST_ENGINE:-}"
+# opengrep collects nothing and rejects --metrics; semgrep must be told.
+METRICS_FLAG=""
+
+# Rule files contain em-dashes and arrows. opengrep reads them through Python,
+# which falls back to the ASCII codec under a POSIX/C locale and dies with
+# "'ascii' codec can't decode byte 0xe2" — on the RULE file, before scanning a
+# single line of source. UTF-8 mode makes that deterministic regardless of the
+# caller's locale.
+# LC_ALL specifically: the bundled interpreter reads rule files with
+# `Path.read_text()` and no explicit encoding, so it uses the locale's
+# preferred encoding. PYTHONUTF8 does not reach it. Without this it dies on the
+# first em-dash in a rule file, before scanning a line of source.
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+if [ -z "$ENGINE" ]; then
+  if command -v opengrep &> /dev/null; then ENGINE=opengrep
+  elif command -v semgrep &> /dev/null; then ENGINE=semgrep
+  fi
+fi
+if [ "$ENGINE" = "semgrep" ]; then METRICS_FLAG="--metrics=off"; fi
+if [ -z "$ENGINE" ] || ! command -v "$ENGINE" &> /dev/null; then
+  echo "❌ no SAST engine installed."
+  echo "   brew install opengrep    (preferred — LGPL, no rule-licence restriction)"
+  echo "   brew install semgrep     (fallback)"
   exit 1
 fi
 
@@ -142,9 +171,9 @@ probe_registry_pack() {
   local tmpdir
   tmpdir=$(mktemp -d)
   echo "// probe" > "$tmpdir/probe.js"
-  semgrep scan --config "$config" --metrics=off --json -o /dev/null "$tmpdir" \
-    2>/dev/null
-  local rc=$?
+  local rc=0
+  "$ENGINE" scan --config "$config" ${METRICS_FLAG} --json -o /dev/null "$tmpdir" \
+    2>/dev/null || rc=$?
   rm -rf "$tmpdir"
   # 0 = no findings, 1 = findings, 2 = findings+errors — all mean "pack loaded OK"
   # 7 = config error (404, YAML parse failure) — pack is unusable
@@ -168,6 +197,10 @@ add_registry_pack() {
   }
 
   if probe_registry_pack "$config"; then
+    if [ "$ALLOW_REGISTRY" != "1" ]; then
+      SKIPPED_PACKS+=("$config (licence: set SAST_ALLOW_REGISTRY=1 to include)")
+      return 0
+    fi
     CONFIGS+=(--config "$config")
   else
     echo "  ⚠️  Registry pack '$pack' unavailable (404 or parse error) — skipping"
@@ -194,8 +227,8 @@ add_community_dir() {
   local tmpdir
   tmpdir=$(mktemp -d)
   echo "// probe" > "$tmpdir/probe.js"
-  semgrep scan --config "$dir" --metrics=off --json -o /dev/null "$tmpdir" 2>/dev/null
-  local rc=$?
+  local rc=0
+  "$ENGINE" scan --config "$dir" ${METRICS_FLAG} --json -o /dev/null "$tmpdir" 2>/dev/null || rc=$?
   rm -rf "$tmpdir"
   if [ "$rc" -eq 7 ]; then
     echo "  ⚠️  Community dir '$label' entirely broken (exit 7, YAML parse failure) — skipping"
@@ -209,6 +242,19 @@ add_community_dir() {
 # ── Build config list ──────────────────────────────────────────────────
 CONFIGS=()
 SKIPPED_PACKS=()
+
+# REGISTRY PACKS ARE OFF BY DEFAULT (licensing). Every `p/...` pack is served
+# under the Semgrep Rules License; the in-house packs under
+# ~/Code/bpm-rulepacks/packs are ours and carry no such terms. Opt in with
+# SAST_ALLOW_REGISTRY=1 when you have decided the terms are acceptable for
+# that particular use.
+ALLOW_REGISTRY="${SAST_ALLOW_REGISTRY:-0}"
+HOUSE_PACKS="${BPM_RULEPACKS:-$HOME/Code/bpm-rulepacks/packs}"
+if [ -d "$HOUSE_PACKS" ]; then
+  for pack in "$HOUSE_PACKS"/*; do
+    [ -d "$pack" ] && CONFIGS+=(--config "$pack")
+  done
+fi
 
 if [ "$MODE" = "fast" ]; then
   # Fast tier — high signal, < 60s on most codebases.
@@ -609,7 +655,9 @@ fi
 FLAGS=()
 FLAGS+=(--json -o "$JSON_OUT")
 FLAGS+=(--sarif-output "$SARIF_OUT")
-FLAGS+=(--metrics=off)  # don't phone home
+# don't phone home. opengrep has no telemetry at all and rejects the flag,
+# which is one of the reasons it is preferred here.
+[ -n "$METRICS_FLAG" ] && FLAGS+=("$METRICS_FLAG")
 
 # Respect .semgrepignore automatically; also add sensible defaults if none exists
 if [ ! -f "$PROJECT_ROOT/.semgrepignore" ]; then
@@ -699,14 +747,35 @@ echo ""
 # Run semgrep — all probed configs are known to work, no || true needed.
 # If semgrep returns exit 1 (findings exist) or 0 (no findings), both are fine.
 # Exit 7 (config error) should not happen here since configs were pre-probed.
-semgrep scan "${CONFIGS[@]}" "${FLAGS[@]}" 2>&1 | tee "$LOG_OUT"
+"$ENGINE" scan "${CONFIGS[@]}" "${FLAGS[@]}" 2>&1 | tee "$LOG_OUT"
 EXIT_CODE=${PIPESTATUS[0]}
 
 echo ""
 if [ "$EXIT_CODE" -eq 0 ] || [ "$EXIT_CODE" -eq 1 ]; then
-  # 0 = clean, 1 = findings found — both are normal exits for semgrep
+  # 0 = clean, 1 = findings found — both are normal exits for the engine.
+  #
+  # BUT THE EXIT CODE IS NOT THE ANSWER. Measured 2026-08-28: one malformed
+  # rule file aborted the whole config load, the engine still exited 0, and
+  # this script printed "✓ Scan complete — 0 findings" having scanned ZERO
+  # files. Every clean result it had ever produced was therefore unfalsifiable.
+  # A scan that scanned nothing is a failure, and so is one whose rules did
+  # not load — say so loudly rather than reporting a clean bill of health.
+  scanned=$(jq '.paths.scanned | length' "$JSON_OUT" 2>/dev/null || echo 0)
+  errors=$(jq '.errors | length' "$JSON_OUT" 2>/dev/null || echo 0)
+  if [ "${scanned:-0}" -eq 0 ]; then
+    echo "❌ SCAN INVALID — zero files were scanned."
+    echo "   This is NOT a clean result. Usual cause: a malformed rule file"
+    echo "   aborts the entire config load. Details:"
+    jq -r '.errors[]? | "   - " + (.message // .long_msg // "unknown") ' "$JSON_OUT" 2>/dev/null | head -10
+    exit 2
+  fi
+  if [ "${errors:-0}" -gt 0 ]; then
+    echo "⚠  $errors rule/config error(s) — results are PARTIAL, not clean:"
+    jq -r '.errors[]? | "   - " + (.message // .long_msg // "unknown")' "$JSON_OUT" 2>/dev/null | head -10
+    exit 2
+  fi
   ok_count=$(jq '.results | length' "$JSON_OUT" 2>/dev/null || echo "?")
-  echo "✓ Scan complete — $ok_count findings"
+  echo "✓ Scan complete — $ok_count findings across $scanned file(s) [engine: $ENGINE]"
   echo ""
   echo "Next steps:"
   echo "  1. Generate report skeleton:"

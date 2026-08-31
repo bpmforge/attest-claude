@@ -18,7 +18,10 @@
 #                 deliverables while this step's tracker is already committed,
 #                 so the gate fails on a tracker that WAS updated. See the
 #                 comment at the gate itself.
-#   5. Runtime  — build + lint (optional, --runtime flag; coding-agent HANDOFFs)
+#   5. Runtime  — build + lint + file size (optional, --runtime flag;
+#                 coding-agent HANDOFFs). File size is checked per-HANDOFF
+#                 rather than only at the phase-4 gate because monoliths
+#                 accrete across tickets — see the comment at the gate.
 #
 # Usage:
 #   run-handoff-gates.sh \
@@ -55,6 +58,7 @@ MANIFEST=""
 COVERAGE=""
 RUNTIME=false
 PROJECT_ROOT_ARG=""
+REVIEW_FILE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -73,6 +77,14 @@ while [[ $# -gt 0 ]]; do
     --runtime)
       RUNTIME=true
       shift
+      ;;
+    --review)
+      # P-A13: the returning artifact is a REVIEW (verdict + findings). Runs
+      # the citation gate mechanically — a REJECT whose citations do not
+      # resolve fails intake (the fabricated-REJECT control). Non-review
+      # HANDOFFs never pass this flag and are untouched.
+      REVIEW_FILE="$2"
+      shift 2
       ;;
     --root)
       PROJECT_ROOT_ARG="$2"
@@ -168,6 +180,19 @@ else
     "add the dependency to docs/TECH_STACK.md, or remove the dependency"
 fi
 
+# ── Gate 2b: reviewer citations (P-A13 — only when --review is passed) ─────
+if [[ -n "$REVIEW_FILE" ]]; then
+  printf '\n%s== GATE: REVIEW CITATIONS ==%s\n' "$_BOLD" "$_RESET" >&2
+  _DG="$(cd "$(dirname "$0")/.." && pwd)/delegation-gate.mjs"
+  if (cd "$ROOT" && node "$_DG" --citations="$REVIEW_FILE") > /dev/null 2>&1; then
+    pass "review citations resolve"
+  else
+    (cd "$ROOT" && node "$_DG" --citations="$REVIEW_FILE") 2>&1 | tail -20 >&2 || true
+    gate_fail "citations" "review verdict cites evidence that does not resolve ($REVIEW_FILE)" \
+      "a REJECT must point at real file:line evidence — fix the citations or the review is discarded (fabricated-REJECT control, RDSAD-234 class)"
+  fi
+fi
+
 # ── Gate 3: coverage (optional) ────────────────────────────────────────────
 if [[ -n "$COVERAGE" ]]; then
   printf '\n%s== GATE: COVERAGE (%s) ==%s\n' "$_BOLD" "$COVERAGE" "$_RESET" >&2
@@ -229,17 +254,32 @@ fi
 # ── Gate 5: runtime (only when --runtime passed — coding-agent handoffs) ───
 if [[ "$RUNTIME" == "true" ]]; then
   printf '\n%s== GATE: RUNTIME (build + lint) ==%s\n' "$_BOLD" "$_RESET" >&2
-  for rv in "validate-build.sh" "validate-lint.sh"; do
+  # validate-file-size.sh runs HERE, per returning HANDOFF -- not only at the
+  # end-of-phase-4 gate. Monoliths accrete: task-decomposer caps each node's
+  # output at ~300 lines, so no single ticket writes a 2,000-line file, but
+  # seven tickets each appending 200 lines to the same file do -- and every one
+  # of them passes an end-of-phase gate that runs long after the growth is
+  # cheap to undo. Checking per-HANDOFF fails the FIRST ticket that pushes a
+  # file over the cap, while the split is still a one-file operation.
+  for rv in "validate-build.sh" "validate-lint.sh" "validate-file-size.sh"; do
     rv_script="$VALIDATORS_DIR/$rv"
     if [[ ! -f "$rv_script" ]]; then
       gap "runtime" "$rv not found in $VALIDATORS_DIR"
       validator_exit
     fi
-    if bash "$rv_script" "$ROOT" > /dev/null 2>&1; then
+    # file-size is scoped to what this run touched (branch point computed for
+    # Gate 4 above). Whole-tree here would fail a returning ticket for
+    # pre-existing oversized files it never opened -- unclearable, and it would
+    # take every gate after it down as unrun. Gate the step on what it owns.
+    rv_args=("$ROOT")
+    if [[ "$rv" == "validate-file-size.sh" && -n "$TRACKER_SINCE" ]]; then
+      rv_args+=(--changed-since "$TRACKER_SINCE")
+    fi
+    if bash "$rv_script" "${rv_args[@]}" > /dev/null 2>&1; then
       pass "runtime gate clean ($rv)"
     else
-      bash "$rv_script" "$ROOT" 2>&1 | tail -20 >&2 || true
-      gap "runtime" "$rv failed — code must build and lint-clean before HANDOFF is accepted"
+      bash "$rv_script" "${rv_args[@]}" 2>&1 | tail -20 >&2 || true
+      gap "runtime" "$rv failed — code must build, lint-clean, and stay under the file-size cap before HANDOFF is accepted"
       validator_exit
     fi
   done
