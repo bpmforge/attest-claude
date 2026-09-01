@@ -251,10 +251,15 @@ scripts/delegation-metrics.mjs
 scripts/fix-verify.mjs
 scripts/gen-status-report.mjs
 scripts/lib/annotate.mjs
+scripts/lib/attempt-outcome.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
 scripts/lib/img-gate.mjs
 scripts/lib/jira-hygiene.mjs
+scripts/lib/jira-tickets-integration.test.mjs
+scripts/lib/jira-tickets-parity.test.mjs
+scripts/lib/jira-tickets.mjs
+scripts/lib/jira-tickets.test.mjs
 scripts/lib/lifecycle-outbox.mjs
 scripts/lib/model-limits-sync.mjs
 scripts/lib/model-tiers.mjs
@@ -341,6 +346,7 @@ scripts/validators/validate-requirement-closure.sh
 scripts/validators/validate-requirements-matrix.sh
 scripts/validators/validate-resilience-patterns.sh
 scripts/validators/validate-rules.sh
+scripts/validators/validate-scope.match.test.sh
 scripts/validators/validate-scope.sh
 scripts/validators/validate-seams.sh
 scripts/validators/validate-security-controls.sh
