@@ -119,6 +119,7 @@ agents/shared/MICRO_LOOP.md
 agents/shared/MODEL_ADAPTER.md
 agents/shared/PERSISTENCE.md
 agents/shared/PHASE_ROUTING_PROTOCOL.md
+agents/shared/PRODUCT_SHAPE_PROTOCOL.md
 agents/shared/QA_VNV_TESTING.md
 agents/shared/RALPH_WIGGUM_LOOP.md
 agents/shared/RESEARCH_TOOLS.md
