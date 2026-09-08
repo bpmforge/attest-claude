@@ -268,6 +268,7 @@ scripts/lib/reflow-audit.mjs
 scripts/lib/review-triggers.mjs
 scripts/lib/rules.mjs
 scripts/lib/runtime-verdict.mjs
+scripts/lib/session-containment.mjs
 scripts/lib/session-receipt.mjs
 scripts/lib/status-report.mjs
 scripts/lib/tests/annotate.test.mjs
@@ -287,6 +288,7 @@ scripts/run-plan.mjs
 scripts/telemetry-report.mjs
 scripts/validators/_lib.sh
 scripts/validators/_lib_sdlc_config.sh
+scripts/validators/_scope-match.sh
 scripts/validators/run-coverage-loop.sh
 scripts/validators/run-handoff-gates.sh
 scripts/validators/validate-adrs.sh
