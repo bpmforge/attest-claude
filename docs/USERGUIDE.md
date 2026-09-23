@@ -206,17 +206,17 @@ Describe your goal in plain English ("securely check all my source and help fix 
 ```
 /sdlc init my-app "Short description of what it is"
 ```
-`sdlc-lead` runs a discovery interview, calls `git-expert --init` (repo bootstrap + branch protection on `main`), creates a `sdlc/setup` branch, then walks through Phase 0 → Phase 3 with git checkpoints after every phase. After Phase 3 gate passes, `sdlc/setup` merges to `main` via PR. Phase 4 feature work runs on `feat/[slug]` branches. Expect 6–8 agent delegations across the full run.
+`sdlc-lead` runs a discovery interview, calls `git-expert --init` (repo bootstrap + branch protection on `main`), creates a `sdlc/setup` branch, then walks through Phase 0 → Phase 3 with git checkpoints after every phase. After Phase 3.5 (Test Design) and Human Approval Gate B, `sdlc/setup` merges to `main` via PR. Phase 4 feature work runs on `feat/[slug]` branches. Expect 6–8 agent delegations across the full run.
 
 ### Existing codebase you don't understand
 ```
-/sdlc onboard             # default: --quick pass, ~15 min
-/sdlc onboard --quick     # explicit quick pass, 7-step high-level
-/sdlc onboard --deep      # Ralph Wiggum inventory loop, ~45-90 min
+/sdlc onboard             # default: Steps 0-7 + lightweight ROUTE/TABLE inventory, ~30-40 min
+/sdlc onboard --quick     # Steps 0-7 only, no inventory verification, ~15-20 min
+/sdlc onboard --deep      # Steps 0-7 + full Ralph Wiggum inventory loop, ~45-90 min
 ```
-`sdlc-lead` creates a `docs/onboard` branch, runs `git-expert --inspect` first (hot files, commit history), detects if the project has a UI, then produces architecture docs and an onboarding guide. If UI-bearing, `ux-engineer --audit` runs automatically. All produced docs are committed via PR to `main`.
+`sdlc-lead` creates a `docs/onboard` branch, runs `git-expert --inspect` first (hot files, commit history), then dispatches four onboard specialists: `landscape-mapper` (LANDSCAPE.md, UI detection), `entry-point-tracer` (entry-point and sequence diagrams), `component-mapper` (C2/C3), and `health-coordinator`. The health-coordinator fans out to code-reviewer ×3, security-auditor, test-engineer and performance-engineer, adding ux-engineer if the project has a UI. `db-architect` draws the ERD. A challenger pass has to find zero contradicted claims before the lead writes ARCHITECTURE.md, ONBOARDING.md and DECISION_LOG.md. All produced docs are committed via PR to `main`.
 
-**`--deep` mode** (`agents/shared/RALPH_WIGGUM_LOOP.md`) runs the quick pass first, then enumerates every unit of the codebase — routes, tables, services, P0 flows, entry points — into `docs/onboard/INVENTORY.md`, produces one artifact per row, and re-iterates on any uncovered rows. Blocks until `./scripts/validators/validate-phase-gate.sh onboard-deep` exits clean. Three sub-skills trigger the individual steps:
+**`--deep` mode** (`agents/shared/RALPH_WIGGUM_LOOP.md`) runs the standard pass first, then enumerates every unit of the codebase — routes, tables, services, P0 flows, entry points — into `docs/onboard/INVENTORY.md`, produces one artifact per row, and re-iterates on any uncovered rows. Blocks until `./scripts/validators/run-coverage-loop.sh onboard-deep` exits clean (3-iteration cap). Three sub-skills trigger the individual steps:
 
 | Skill | Step | Effect |
 |-------|------|--------|
@@ -364,20 +364,16 @@ Safety rails (always enforced, cannot be bypassed silently):
 Reference: `references/git-workflow-checklist.md`. Output: `docs/git/*.md`.
 
 ### `/security`
-**Depth flags:** `--quick` (default) / `--deep`
-**Focused modes:** `--owasp`, `--semgrep`, `--threat-model`, `--deps`
+**Depth flags:** `--quick` (default) / `--deep` / `--fix`
 
 ```
-/security                       # --quick by default: phases 1-3, ~10 min
-/security --quick               # explicit: single-pass OWASP + semgrep scan
-/security --deep                # Ralph Wiggum loop: ~45-90 min, all OWASP + all semgrep rules + iterative attack-chain
-/security --owasp               # OWASP Top 10 pass only
-/security --semgrep             # deep static analysis only
-/security --threat-model        # STRIDE threat model only
-/security --deps                # dependency vulnerability audit only
+/security                       # --quick by default: Wave 1 scanners + OWASP Web, ~10 min
+/security --deep                # all four specialist waves + attack chainer + coverage loop, ~45-90 min
+/security --fix                 # audit, then verified fix loop (re-scan proves each fix)
+/security --deep --fix          # exhaustive find-and-fix
 ```
 
-**`--quick`** (default) — phases 1-3: understand → automated scan → OWASP once-over. ~10 min.
+`security-auditor` is a coordinator: Wave 1 (semgrep-runner, secrets-scanner, dependency-auditor) → Wave 2 (owasp-web-checker, + owasp-llm-checker if LLM code) → Wave 3 (threat-modeler, + cloud/IaC checkers when detected) → Wave 4 attack-chainer, which links findings' yields to other findings' preconditions into multi-step exploit chains. `--quick` runs Wave 1 + OWASP Web only. It writes `docs/security/final-report.md`; any HIGH/CRITICAL triggers a mandatory challenger pass.
 
 **`--deep`** — full Ralph Wiggum loop over every OWASP category iterated to confidence ≥ 7, every custom semgrep rule file walked, iterative attack-chain until a full pass finds no new chains. Blocks until `./scripts/validators/validate-phase-gate.sh security-deep` exits clean. Use before production deploys, compliance audits, post auth/crypto/input changes, CVE-reachability checks.
 
