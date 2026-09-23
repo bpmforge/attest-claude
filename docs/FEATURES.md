@@ -482,7 +482,7 @@ Fifty-five bash validators + gate runners in `scripts/validators/`. Each returns
 | `validate-module-boundaries.sh` | Cross-module imports comply with dependency rules in MODULE_DESIGN.md |
 | `validate-module-design.sh` | MODULE_DESIGN.md: domain-aligned naming pattern present, no technical-layer names, circular dependency check passes |
 | `validate-no-ascii-art.sh` | No Unicode box-drawing characters or ASCII banners in documentation files |
-| `validate-owasp.sh` | All 10 OWASP categories present, confidence ≥ 7, attack-chains section present |
+| `validate-owasp.sh` | All 10 OWASP categories present, confidence ≥ 7, `ATTACK_CHAINS_<date>.md` (or legacy `attack-chains.md`) present |
 | `validate-phase-gate.sh` | Orchestrator — chains the right validators for a given SDLC phase |
 | `validate-release-readiness.sh` | 10-condition release gate: FIX_BACKLOG closed, 4 review verdicts (security/code/ux/perf), coverage threshold, container CVE scan, RUNTIME PASS |
 | `validate-requirements-matrix.sh` | REQUIREMENTS_MATRIX.md: P0 use-case rows have Test ID and Status; cross-references USE_CASES.md |
@@ -523,10 +523,10 @@ Route discovery covers Express/Fastify/Next.js app router/FastAPI/Flask/Go net-h
 
 `--quick` and `--deep` flags on `/sdlc onboard` and `/security`:
 
-| Skill | `--quick` (default) | `--deep` |
-|-------|---------------------|----------|
-| `/sdlc onboard` | 7-step high-level pass (~15 min) | Ralph Wiggum inventory loop (~45-90 min) |
-| `/security` | Phases 1-3: understand + scan + OWASP once-over (~10 min) | Ralph Wiggum loop over OWASP + semgrep rule files + iterative attack-chain (~45-90 min) |
+| Skill | `--quick` | (default) | `--deep` |
+|-------|-----------|-----------|----------|
+| `/sdlc onboard` | Steps 0–7, no inventory check (~15–20 min) | Steps 0–7 + ROUTE/TABLE inventory loop (~30–40 min) | + full Ralph Wiggum inventory loop (~45–90 min) |
+| `/security` | Wave 1 scanners + OWASP Web (~10 min) | same as `--quick` | All four specialist waves + attack chainer + `security-deep` coverage loop (~45–90 min) |
 
 Deep modes block until their corresponding validator gate exits clean.
 
