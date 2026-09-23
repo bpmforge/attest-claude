@@ -373,7 +373,7 @@ Reference: `references/git-workflow-checklist.md`. Output: `docs/git/*.md`.
 /security --deep --fix          # exhaustive find-and-fix
 ```
 
-`security-auditor` is a coordinator: Wave 1 (semgrep-runner, secrets-scanner, dependency-auditor) → Wave 2 (owasp-web-checker, + owasp-llm-checker if LLM code) → Wave 3 (threat-modeler, + cloud/IaC checkers when detected) → Wave 4 attack-chainer, which links findings' yields to other findings' preconditions into multi-step exploit chains. `--quick` runs Wave 1 + OWASP Web only. It writes `docs/security/final-report.md`; any HIGH/CRITICAL triggers a mandatory challenger pass.
+`security-auditor` is a coordinator: Wave 1 (semgrep-runner, secrets-scanner, dependency-auditor) → Wave 2 (owasp-web-checker, + owasp-llm-checker if LLM code) → Wave 3 (threat-modeler, + cloud/IaC checkers when detected) → Wave 4 attack-chainer, which links findings' yields to other findings' preconditions into multi-step exploit chains. `--quick` runs Wave 1 + OWASP Web only. It writes `docs/security/final-report.md`; any HIGH/CRITICAL triggers a mandatory challenger pass. Focused modes run one surface: `--owasp` (semgrep-runner + OWASP checkers; combines with `--deep`), `--threat-model` (threat-modeler only), `--deps` (dependency-auditor only).
 
 **`--deep`** — full Ralph Wiggum loop over every OWASP category iterated to confidence ≥ 7, every custom semgrep rule file walked, iterative attack-chain until a full pass finds no new chains. Blocks until `./scripts/validators/validate-phase-gate.sh security-deep` exits clean. Use before production deploys, compliance audits, post auth/crypto/input changes, CVE-reachability checks.
 
