@@ -33,6 +33,11 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Version = the checkout's newest release tag (this repo has no package.json).
+# It used to be the literal "v1.4.0" for every release through v3.11.0.
+ATTEST_CLAUDE_VERSION="$(git -C "$SCRIPT_DIR" describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')"
+ATTEST_CLAUDE_VERSION="${ATTEST_CLAUDE_VERSION:-unknown (not a git checkout)}"
+for _arg in "$@"; do [ "$_arg" = "--version" ] && { echo "attest-claude v$ATTEST_CLAUDE_VERSION"; exit 0; }; done
 CLAUDE_HOME="$HOME/.claude"
 
 # ─── Node version check ───────────────────────────────────────────────────────
@@ -131,7 +136,6 @@ INSTALL_PWS=true
 INSTALL_PLAYWRIGHT_MCP=true
 INSTALL_MEMORY=true
 INSTALL_CODE_SEARCH=true
-INTERACTIVE=false
 DO_UPDATE=false
 
 for arg in "$@"; do
@@ -143,7 +147,7 @@ for arg in "$@"; do
     --tools)                INSTALL_TOOLS=true ;;
     --compact)               COMPACT_AGENTS=true ;;
     --no-code-search)       INSTALL_CODE_SEARCH=false ;;
-    --yes|-y)               INTERACTIVE=false ;;  # accept all defaults non-interactively
+    --yes|-y)               : ;;  # accept all defaults non-interactively
     --help|-h)
       echo "attest-claude — Installation"
       echo ""
@@ -224,7 +228,7 @@ fi
 # ─── Interactive prompts (when run with no flags from a terminal) ───
 if [ $# -eq 0 ] && [ -t 0 ]; then
   echo ""
-  echo "attest-claude v1.4.0 — Installation"
+  echo "attest-claude v$ATTEST_CLAUDE_VERSION — Installation"
   echo "====================================="
   echo ""
   echo "Core install (always): agents, skills, shared protocols, hooks, scripts, semgrep rules"
@@ -679,7 +683,7 @@ else
 fi
 
 echo ""
-echo "Installation complete!"
+echo "Installation complete! (attest-claude v$ATTEST_CLAUDE_VERSION)"
 echo ""
 echo "Files installed:"
 echo "  ~/.claude/agents/              (primary agents + references + micro-agent clusters)"
