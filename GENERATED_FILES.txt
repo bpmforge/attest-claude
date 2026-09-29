@@ -254,6 +254,7 @@ scripts/lib/annotate.mjs
 scripts/lib/attempt-outcome.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
+scripts/lib/hook-guards.mjs
 scripts/lib/img-gate.mjs
 scripts/lib/jira-hygiene.mjs
 scripts/lib/jira-tickets-integration.test.mjs
