@@ -254,6 +254,7 @@ scripts/fix-verify.mjs
 scripts/gen-status-report.mjs
 scripts/lib/annotate.mjs
 scripts/lib/attempt-outcome.mjs
+scripts/lib/compliance-stats.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
 scripts/lib/edit-task-run.mjs
