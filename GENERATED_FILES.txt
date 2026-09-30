@@ -212,6 +212,7 @@ exemplars/sequence-diagram.md
 references/adr-template.md
 references/anti-slop-audit.md
 references/antv-x6-v3.md
+references/click-path-audit.md
 references/cloud-cost-checklist.md
 references/code-health-checklist.md
 references/context7-mcp.md
@@ -222,6 +223,7 @@ references/engineering-artifacts.md
 references/figma-adapter.md
 references/git-workflow-checklist.md
 references/jira-adapter.md
+references/language-review-checklists.md
 references/library-adoption-protocol.md
 references/library-api-grounding.md
 references/llm-routing-principles.md
@@ -254,6 +256,8 @@ scripts/lib/annotate.mjs
 scripts/lib/attempt-outcome.mjs
 scripts/lib/derive-lanes.mjs
 scripts/lib/design-tokens.mjs
+scripts/lib/edit-task-run.mjs
+scripts/lib/edit-task-stats.mjs
 scripts/lib/hook-guards.mjs
 scripts/lib/img-gate.mjs
 scripts/lib/jira-hygiene.mjs
