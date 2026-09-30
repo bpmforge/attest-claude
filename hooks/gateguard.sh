@@ -29,12 +29,14 @@ if [ -f "$state" ]; then
   mtime=$(stat -f %m "$state" 2>/dev/null || stat -c %Y "$state" 2>/dev/null || echo "$now")
   [ $((now - mtime)) -ge $ttl ] && rm -f "$state"
 fi
-grep -qxF "$file_path" "$state" 2>/dev/null && exit 0
-echo "$file_path" >> "$state"
+# Hash the path: raw paths broke `grep -x` on newlines (a multi-line path matched its first line).
+key=$(printf '%s' "$file_path" | shasum | cut -c1-40)
+grep -qxF "$key" "$state" 2>/dev/null && exit 0
+echo "$key" >> "$state"
 
 if [ -n "$EXPERTS_GATEGUARD_LOG" ]; then
   jq -cn --arg s "$session" --arg f "$file_path" --argjson t "$now" \
-    '{ts:$t,event:"gate_denied",session:$s,file:$f}' >> "$EXPERTS_GATEGUARD_LOG"
+    '{ts:$t,event:"gate_denied",session:$s,file:$f}' >> "$EXPERTS_GATEGUARD_LOG" 2>/dev/null || true
 fi
 
 if [ -f "$file_path" ]; then
