@@ -26,7 +26,7 @@ row=$(printf '%s' "$input" | jq -c --argjson ts "$ts" --arg group "$group" '
     session: (.session_id // null),
     tool: ((.tool_name // "") | ascii_downcase),
     file: (.tool_input.file_path // .tool_input.path // null),
-    cmd: ((.tool_input.command // null) | if type == "string" then .[:300] else null end),
+    cmd: ((.tool_input.command // null) | if type == "string" then (if length > 600 then .[:300] + " ... " + .[-300:] else . end) else null end),
     out: ((.tool_response // "") | if type == "string" then . else ((.stdout // "") + (.stderr // "") + (.output // "") + (if (.content | type) == "string" then .content else "" end)) end | head_tail),
     tool_use_id: (.tool_use_id // null),
     group: (if $group == "" then null else $group end) }' 2>/dev/null) || exit 0
