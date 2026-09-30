@@ -431,6 +431,11 @@ if [ -f "$SETTINGS" ]; then
     echo '        {"matcher":"Write|Edit|MultiEdit","hooks":[{"type":"command","command":"'"$CLAUDE_HOME"'/hooks/config-protection.sh"}]}'
     echo "        Optional gateguard.sh (needs EXPERTS_GATEGUARD=1) takes the same entry shape."
   fi
+  if ! grep -q "trace-tool-call" "$SETTINGS" 2>/dev/null; then
+    echo "  NOTE: trace-tool-call.sh (opt-in rule-compliance trace, needs EXPERTS_TRACE_LOG=<file>) is installed but not registered."
+    echo "        Add to hooks.PostToolUse in $SETTINGS:"
+    echo '        {"matcher":"*","hooks":[{"type":"command","command":"'"$CLAUDE_HOME"'/hooks/trace-tool-call.sh"}]}'
+  fi
 else
   echo "  WARNING: $SETTINGS not found — create it to configure hooks"
 fi
