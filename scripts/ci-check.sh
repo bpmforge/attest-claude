@@ -23,6 +23,11 @@ while IFS= read -r -d '' f; do
   fi
 done < <(find . -name "*.sh" -not -path "./node_modules/*" -print0)
 
+echo "== hook behaviour tests =="
+if ! bash tests/hooks/test-hooks.sh; then
+  FAIL=1
+fi
+
 echo "== node --check syntax check =="
 while IFS= read -r -d '' f; do
   if ! node --check "$f" 2>/tmp/ci-check-err; then
