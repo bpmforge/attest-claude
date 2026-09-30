@@ -424,6 +424,13 @@ if [ -f "$SETTINGS" ]; then
     echo "  NOTE: You may need to manually add hook entries to $SETTINGS"
     echo "  See the hooks/ directory for available hook scripts"
   fi
+  # Group K hooks: copied above but never active until registered. Print the entry.
+  if ! grep -q "config-protection" "$SETTINGS" 2>/dev/null; then
+    echo "  NOTE: config-protection.sh (blocks edits to existing lint/type/test config) is installed but not registered."
+    echo "        Add to hooks.PreToolUse in $SETTINGS:"
+    echo '        {"matcher":"Write|Edit|MultiEdit","hooks":[{"type":"command","command":"'"$CLAUDE_HOME"'/hooks/config-protection.sh"}]}'
+    echo "        Optional gateguard.sh (needs EXPERTS_GATEGUARD=1) takes the same entry shape."
+  fi
 else
   echo "  WARNING: $SETTINGS not found — create it to configure hooks"
 fi

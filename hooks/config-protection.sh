@@ -5,12 +5,8 @@
 # Hook type: PreToolUse (Write|Edit|MultiEdit). Adapted from affaan-m/ECC (MIT).
 
 [ "$EXPERTS_ALLOW_CONFIG_EDIT" = "1" ] && exit 0
-input=$(cat)
-file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty')
-[ -z "$file_path" ] && exit 0
-[ -f "$file_path" ] || exit 0
-
-case "$(basename "$file_path")" in
+check_name() {
+  case "$1" in
   .eslintrc|.eslintrc.js|.eslintrc.cjs|.eslintrc.json|.eslintrc.yml|.eslintrc.yaml|\
   eslint.config.js|eslint.config.mjs|eslint.config.cjs|eslint.config.ts|\
   .prettierrc|.prettierrc.js|.prettierrc.cjs|.prettierrc.json|.prettierrc.yml|.prettierrc.yaml|\
@@ -19,8 +15,29 @@ case "$(basename "$file_path")" in
   jest.config.js|jest.config.ts|jest.config.cjs|.golangci.yml|.golangci.yaml|.golangci.toml|\
   ruff.toml|.ruff.toml|mypy.ini|.mypy.ini|.flake8|.pylintrc|clippy.toml|.clippy.toml|\
   rustfmt.toml|.rustfmt.toml|deny.toml|.editorconfig|.stylelintrc|.stylelintrc.json)
-    echo "BLOCKED: $file_path is lint/format/type/test config. Editing it to make a check pass hides the defect instead of fixing it. Fix the source the check complains about. If the config change IS the task, ask the user to re-run with EXPERTS_ALLOW_CONFIG_EDIT=1." >&2
-    exit 2
-    ;;
+    echo "BLOCKED: $2 is lint/format/type/test config. Editing it to make a check pass hides the defect instead of fixing it. Fix the source the check complains about. If the config change IS the task, ask the user to re-run with EXPERTS_ALLOW_CONFIG_EDIT=1." >&2
+    return 0 ;;
+  esac
+  return 1
+}
+if ! command -v jq >/dev/null 2>&1; then
+  echo "CONFIG-PROTECTION: jq not found -- guard DISABLED (install jq)" >&2
+  exit 0
+fi
+input=$(cat)
+file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty')
+[ -z "$file_path" ] && exit 0
+[ -f "$file_path" ] || exit 0
+
+# Vendored / generated / fixture trees are not "loosening a check".
+case "$file_path" in
+  */node_modules/*|*/vendor/*|*/dist/*|*/build/*|*/.git/*|*/fixture/*|*/fixtures/*|*/__fixtures__/*|node_modules/*|vendor/*|dist/*|build/*|fixture/*|fixtures/*|__fixtures__/*) exit 0 ;;
 esac
+
+# Case-insensitive (macOS FS) and symlink-aware: check the given AND the resolved basename.
+real=$(realpath "$file_path" 2>/dev/null || echo "$file_path")
+for candidate in "$file_path" "$real"; do
+  name=$(basename "$candidate" | tr '[:upper:]' '[:lower:]')
+  check_name "$name" "$candidate" && exit 2
+done
 exit 0
