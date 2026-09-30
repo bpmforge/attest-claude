@@ -280,6 +280,7 @@ scripts/lib/tickets-graph.mjs
 scripts/lib/tickets-lifecycle.mjs
 scripts/lib/tickets-seams.mjs
 scripts/lib/tickets.mjs
+scripts/lib/trace-order.mjs
 scripts/lib/tracker-model.mjs
 scripts/lib/user-stories.mjs
 scripts/loop-learn.mjs
