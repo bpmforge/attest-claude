@@ -69,10 +69,14 @@ expect "trace: parallel calls (same assistant message) share a group" "$(jq -r .
 expect "trace: the group is the assistant message id" "$(sed -n 1p "$TL" | jq -r .group)" msg_par
 expect "trace: a separate message gets a different group" "$(sed -n 3p "$TL" | jq -r .group)" msg_solo
 expect "trace: long output keeps the TAIL (failure summary), not just the head" "$(sed -n 3p "$TL" | jq -r '.out | test("FAILED 1$")')" true
+LONGC=$(head -c 2000 /dev/zero | tr '\0' 'y')
+tr_ "{\"session_id\":\"s\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"$LONGC cat /answer/key --final\"},\"tool_response\":\"\"}" >/dev/null
+expect "trace: a long command keeps its TAIL (a path/flag at the end must stay visible)" "$(tail -1 "$TL" | jq -r '.cmd | test("--final$")')" true
+expect "trace: a long command stays bounded" "$(tail -1 "$TL" | jq -r '.cmd | length <= 605')" true
 expect "trace: output is bounded" "$(sed -n 3p "$TL" | jq -r '.out | length <= 210')" true
 expect "trace: object tool_response (Bash) is flattened to text" "$(sed -n 3p "$TL" | jq -r '.out|type')" string
 expect "trace: garbage stdin never fails the tool call" "$(echo 'not json' | EXPERTS_TRACE_LOG="$TL" bash "$H/trace-tool-call.sh" >/dev/null 2>&1; echo $?)" 0
-expect "trace: garbage stdin adds no row" "$(wc -l < "$TL" | tr -d ' ')" 3
+expect "trace: garbage stdin adds no row" "$(wc -l < "$TL" | tr -d ' ')" 4
 expect "trace: unwritable log path never fails the tool call" "$(tr_ '{"tool_name":"Bash","tool_input":{"command":"ls"}}' /nonexistent/dir/t.jsonl)" 0
 expect "trace: missing transcript still records (group null)" "$(tr_ '{"session_id":"s","tool_name":"Bash","tool_use_id":"nope","transcript_path":"/none","tool_input":{"command":"ls"},"tool_response":""}' >/dev/null; tail -1 "$TL" | jq -r '.group')" null
 
