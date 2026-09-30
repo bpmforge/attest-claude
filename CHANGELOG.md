@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.12.0] — 2026-09-30
+
+Regenerated from attest v3.12.0 (Group K — see the attest changelog for the full story).
+
+### Added (hooks — per-target, hand-owned here)
+- `hooks/config-protection.sh` (PreToolUse): blocks edits to an existing lint/type/test config; case-insensitive, symlink-aware, vendored/fixture trees exempt; `EXPERTS_ALLOW_CONFIG_EDIT=1` bypasses.
+- `hooks/gateguard.sh` (PreToolUse, **opt-in** `EXPERTS_GATEGUARD=1`): fact-forcing gate; per-session key, 30-minute TTL, path hashing, `EXPERTS_GATEGUARD_LOG`.
+- `hooks/trace-tool-call.sh` (PostToolUse, **opt-in** `EXPERTS_TRACE_LOG=<file>`): per-tool-call trace with the issuing message id as `group`, so parallel calls are recognised as unordered.
+- `tests/hooks/test-hooks.sh` (32 behavioural tests) now runs in `scripts/ci-check.sh`; the hooks were previously only checked by hand.
+- `install.sh` prints the `settings.json` entries for the three hooks (it never edits your settings; they are copied but inactive until registered).
+
+### Generated from attest
+`references/language-review-checklists.md`, `references/click-path-audit.md`, agent additions (error-handling-auditor, type-safety-checker, MCP06 security checklist, onboard invariants, `test-engineer --coverage --pr`), `scripts/lib/{hook-guards,trace-order,edit-task-*,compliance-stats}.mjs`.
+
 ## [3.5.0] — 2026-08-11
 
 ### Added — gauntlet loop (regenerated from canonical v3.5.0)
