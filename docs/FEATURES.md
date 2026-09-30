@@ -589,6 +589,8 @@ Nine hook scripts in `hooks/`, copied (not symlinked) into `~/.claude/hooks/` by
 |------|------|--------------|
 | `block-dangerous.py` | PreToolUse (Bash) | Blocks commands on the dangerous-commands blocklist (`rm -rf /` and other hard-to-undo destructive operations) |
 | `block-env-write.sh` | PreToolUse (Write) | Blocks writes to `.env*` files and files matching secret patterns |
+| `config-protection.sh` | PreToolUse (Write\|Edit\|MultiEdit) | Blocks edits to EXISTING lint/format/type/test config (eslint, tsconfig, ruff, clippy…) so an agent cannot loosen a check to pass it; new files allowed; bypass `EXPERTS_ALLOW_CONFIG_EDIT=1` (adapted from ECC, MIT) |
+| `gateguard.sh` | PreToolUse (Write\|Edit\|MultiEdit) | **Opt-in** `EXPERTS_GATEGUARD=1`: denies the first edit of each file per session until the agent states importers/affected APIs/verbatim instruction, then allows the retry (adapted from ECC, MIT; unproven until an attest eval A/B) |
 | `commit-validator.sh` | PreToolUse (Bash, `git commit`) | Enforces Conventional Commits format (`type(scope): description`) on every commit message |
 | `format-on-edit.sh` | PostToolUse | Auto-formats edited files by type — prettier / black + isort / gofmt / rustfmt |
 | `lint-on-edit.sh` | PostToolUse | ESLint on JS/TS, ruff (or flake8) on Python; output returned to Claude so it can fix issues in the same turn |
