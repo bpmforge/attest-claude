@@ -334,7 +334,7 @@ Live in `agents/game/`. Activated by the `/sdlc init "<name>" "<desc>" --game` f
 | `gameplay-engineer` | Engine-grain implementation (Godot/Unity/Phaser/Bevy): frame budget, fixed-timestep vs render FPS, allocation discipline, input buffering, determinism |
 | `game-balance-designer` | Progression curves, economy sinks/sources; **simulates 1000 player-sessions** as a rerunnable script before shipping numbers |
 | `playtest-evaluator` | Blind-first playtest of the vertical slice; 6 fun heuristics with evidence, time-to-first-success vs the slice acceptance test |
-| `game-asset-pipeline` | Sprite batch micro-loop: gen → lattice/pixel-snapper cleanup + transparency de-fringe (deterministic scripts in attest's `skills/game-asset-pipeline/scripts/`; not yet shipped in this repo) → sprite-sheet pack → portable TexturePacker-hash atlas manifest for engine import |
+| `game-asset-pipeline` | Sprite batch micro-loop: gen → lattice/pixel-snapper cleanup + transparency de-fringe (deterministic scripts, run from an attest checkout) → sprite-sheet pack → portable TexturePacker-hash atlas manifest for engine import |
 | `game-producer` | Lifecycle gates on builds (prototype kill-criteria, vertical slice, alpha feature-lock, beta content-lock, cert, gold), milestones, scope control |
 | `level-designer` | Player flow, encounter design, blockout/greybox discipline, pacing beat charts |
 | `narrative-designer` | Story delivered through systems: branching structure, quest logic, barks, environmental storytelling, dialogue data formats |
@@ -401,7 +401,7 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 | `/reliability` | `reliability-engineer` | Load testing and resilience: failure-mode matrices, chaos scenarios, circuit breakers |
 | `/design-iterate` | `design-iterator` | Render → screenshot → critique against tokens.json → fix → re-verify |
 | `/gauntlet` | `gauntlet-lead` | Builders never grade their own work; blind critics grade against a real reference bar |
-| `/game-asset-pipeline` | (scripts) | Deterministic cleanup, de-fringing and atlas packing for generated pixel-art sprites. The skill names three scripts that only ship in attest so far |
+| `/game-asset-pipeline` | (scripts) | Deterministic cleanup, de-fringing and atlas packing for generated pixel-art sprites, using three `sharp`-based scripts run from an attest checkout |
 | `/vault` | (inline) | Query, ingest into and lint the agent-brain-vault project wiki |
 | `memory` | (reference) | How to use the memory MCP across sessions (no slash trigger) |
 
