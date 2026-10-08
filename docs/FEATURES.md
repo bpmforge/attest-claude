@@ -125,7 +125,7 @@ OWASP Top 10, threat modeling, Semgrep scans, dependency audits. Runs as 5-phase
 
 Four user modes (`--review`, `--debt`, `--consolidate`, `--patterns`), executed as 4-phase orchestrator internally: understand → tooling → review passes → report.
 
-Reviews across **8 dimensions**: complexity, duplication, error handling, type invariants, patterns, naming, comment accuracy, and anti-slop (threshold ≥ 8). The anti-slop dimension checks for AI-generated bloat patterns cataloged in ANTI_SLOP_RULES.md.
+Reviews across **9 dimensions**, the set the `/review-code` skill and the `code-reviewer` agent score: complexity, duplication, error handling, type invariants, patterns, naming, comment accuracy, dead/unutilized code, and tech-stack compliance (deps match TECH_STACK.md; no tech outside the design). The `anti-slop-auditor` runs alongside them on every review and checks for the AI-generated bloat patterns cataloged in ANTI_SLOP_RULES.md (threshold ≥ 8); its findings feed the synthesizer, but it is not one of the nine scored dimensions.
 
 ### `ux-engineer` — UX design & accessibility (`mode: primary`)
 
@@ -277,17 +277,17 @@ Methodology docs: `OWASP_METHODOLOGY.md`, `OWASP_LLM_METHODOLOGY.md`, `CLOUD_MET
 
 ### Code-review micro-agents
 
-Live in `agents/code-review/`. Dispatched by `code-reviewer` (coordinator) in parallel — each covers one review dimension.
+Live in `agents/code-review/`. Dispatched by `code-reviewer` (coordinator) in parallel. Tech-stack compliance has no micro-agent: the coordinator runs `validate-tech-stack.sh` itself. The anti-slop auditor is an extra pass, not a scored dimension.
 
-| Agent | Dimension |
+| Agent | Covers |
 |-------|-----------|
 | `complexity-analyzer` | Cyclomatic complexity, nesting depth, cognitive load |
 | `duplication-detector` | Copy-paste patterns, near-duplicate logic, DRY violations |
 | `error-handling-auditor` | Silent failures, over-broad catch, missing boundary validation |
 | `type-safety-checker` | Any-cast abuse, non-null assertions, unsafe type coercions |
 | `pattern-consistency-checker` | Naming, import style, module structure — deviation from project conventions |
-| `anti-slop-auditor` | 20-rule AI slop catalog (R-01..R-20): bloat, dead code, speculative abstractions, generated filler |
-| `dead-code-detector` | Unimplemented stubs, never-called functions, unused exports, orphan files, disconnected pipelines (tool-first: knip/ts-prune/vulture/staticcheck + grep) |
+| `anti-slop-auditor` | 31-rule AI slop catalog (R-01..R-31): bloat, speculative abstractions, generated filler, slopsquatting, credential leakage |
+| `dead-code-detector` | Unimplemented stubs, never-called functions, unused exports, orphan files, disconnected pipelines, unreachable branches (tool-first: knip/ts-prune/vulture/staticcheck + grep fallback) |
 | `code-health-synthesizer` | Coordinator synthesizer — reads all seven micro-agent outputs, produces `HEALTH_ASSESSMENT.md` with prioritized backlog |
 
 Methodology: `agents/code-review/METHODOLOGY.md` — per-dimension grading rubrics, severity escalation rules, FIX_BACKLOG format.
@@ -370,7 +370,7 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 | `/code` | `coding-agent` | Implement from SDLC design docs — API verification, anti-slop enforcement, tech stack compliance |
 | `/git-expert` | `git-expert` | Git lifecycle (init / feature / release / recover / inspect / sync) |
 | `/security` | `security-auditor` | OWASP audit, threat model, Semgrep scan |
-| `/review-code` | `code-reviewer` | Code health review (review / debt / consolidate / patterns) |
+| `/review-code` | `code-reviewer` | 9-dimension code health review incl. dead/unused-code + tech-stack compliance (review / debt / consolidate / patterns) |
 | `/research` | `researcher` | Deep research with source evaluation |
 | `/test-expert` | `test-engineer` | Test strategy, unit/e2e tests, coverage |
 | `/perf` | `performance-engineer` | Profile, benchmark, optimize |
@@ -648,7 +648,7 @@ Canonical checklists and templates agents read at runtime. Each is plain markdow
 | Reference | Used by | Purpose |
 |---|---|---|
 | `git-workflow-checklist.md` | `git-expert` | Conventional commits, SemVer, Keep-a-Changelog, recovery scenarios, report templates |
-| `code-health-checklist.md` | `code-reviewer` | 8 dimensions, silent-failure hunter, consolidation catalog, language thresholds |
+| `code-health-checklist.md` | `code-reviewer` | The 9 review dimensions, silent-failure hunter, consolidation catalog, language thresholds |
 | `owasp-checklist.md` | `security-auditor` | OWASP Top 10 + verification steps |
 | `semgrep-guide.md` | `security-auditor` | Semgrep setup, rule packs, two-tier scans |
 | `semgrep-community-rules.md` | `security-auditor` | Community rule inventory |
@@ -659,6 +659,31 @@ Canonical checklists and templates agents read at runtime. Each is plain markdow
 | `engineering-artifacts.md` | `sdlc-lead` | SDLC phase deliverables per phase |
 | `report-template.md` | all agents | Common report header + confidence footer |
 | `context7-mcp.md` | all agents | Live library docs via Context7 MCP |
+| `parallel-worktree-agent-playbook.md` | orchestrating session | Gotchas for briefing multiple agents on separate tickets concurrently: worktree isolation, git-stash cross-worktree collision, `--base origin/main`, `build-target-claude.mjs --out`, awk/bash portability traps, fixture/CHANGELOG/merge-gate conventions |
+| `jira-adapter.md` | orchestrating session, sdlc-lead | Mirror the ticket lifecycle to Jira Data Center: setup, verbs, SDLC hygiene mapping (grab-issues-not-epics, epic-closes-when-children-done, maker≠verifier, blocking links, lane→component), and graceful fallback to `plan.json`-only. Wraps `scripts/jira/jira.mjs`, which ships only in attest (as does `docs/DESIGN_JIRA_ADAPTER.md`) |
+| `figma-adapter.md` | design-system-lead, frontend-design | Bring a real Figma design into the design pipeline: `pull` a file → normalized `figma-snapshot.json`, `derive-tokens` → `docs/design/tokens.json` (which stays authoritative), one-way Figma→code, graceful fallback to prose-authored tokens. Wraps `scripts/figma/figma.mjs`, which ships only in attest (as does `docs/DESIGN_FIGMA_ADAPTER.md`) |
+| `adr-template.md` | `CHALLENGER_PROTOCOL`, `validate-adrs.sh` | Blank Architecture Decision Record for a hard-to-reverse choice; copy to `docs/adrs/ADR-NNN-<slug>.md` |
+| `anti-slop-audit.md` | `code-reviewer` | Six LLM-code anti-patterns to hunt on every review: try/catch outside system boundaries, abstractions with one implementation, single-use helpers, "what" comments, scope creep, framework wrappers |
+| `antv-x6-v3.md` | `/api-ground` | AntV X6 v3 API facts that training data and npm get wrong, verified against an installed tree |
+| `click-path-audit.md` | `ui-verifier`, `frontend-design` | Static preflight for handlers that each work but cancel each other out in one click path |
+| `cloud-cost-checklist.md` | `cost-engineer` | Per-category cloud cost checks, how to measure on each major cloud, typical savings |
+| `data-classification-checklist.md` | `data-steward` | Classification levels and the obligations attached to each class of field |
+| `design-system-tradeoffs.md` | `frontend-design` | Choosing between three design-system architectures by team size, time budget and customization needs |
+| `language-review-checklists.md` | `code-reviewer`, `coding-agent`, `type-safety-checker`, `error-handling-auditor`, `concurrency-checker` | Rust, TypeScript, Python and Go checks, each with a machine-checkable form; read only the diff's languages |
+| `library-adoption-protocol.md` | `coding-agent`, `/pre-code`, `/api-ground` | Four questions to answer, from four authorities, before adopting or upgrading a third-party library |
+| `library-api-grounding.md` | `/api-ground` | Why generated code calls methods that do not exist, and how to detect each cause mechanically |
+| `llm-routing-principles.md` | read on demand (no agent cites it) | Failure modes and principles for routing workloads to local or hosted models |
+| `load-test-checklist.md` | `reliability-engineer` | Load-test types, tool selection, NFR-to-threshold recipe, resilience patterns, chaos starters |
+| `local-agentic-models.md` | `MODEL_ADAPTER`, `LOCAL_LLM_PRIMER` (shared protocols) | Local models that hold up for tool calling, and the runtime settings that make or break them |
+| `mermaid-safe-syntax.md` | `sdlc-lead`, `BOOK_PROTOCOL` | Rules that prevent the Mermaid parse errors LLM generation introduces; checked by `validate-mermaid.sh` |
+| `observability-checklist.md` | `analytics-architect` | Metric methodologies, metric design, taxonomy, dashboard patterns, alert rules |
+| `phase-completion-checklist.md` | read on demand (no agent cites it) | What "done" means per SDLC phase: the validator gate plus the human-judgment checks |
+| `real-browser-bridge.md` | `design-iterator`, `/design-iterate`, `BROWSER_TESTING` | How to audit logged-in, real-world UIs that an isolated dev-server browser cannot reach |
+| `sre-cloud-patterns.md` | read on demand (no agent cites it) | Per-cloud service equivalents (AWS, GCP, Azure) for the operational concerns `sre-engineer` designs |
+| `tracker-data-model-template.md` | `sdlc-init-phases-3-4` | Blank Tracker Data Model to fill in before generating a backlog into an external tracker |
+| `validator-performance.md` | read on demand (no agent cites it) | Runtime cost and rerun safety of each validator in `scripts/validators/` |
+| `visual-design-loop.md` | `design-iterator`, `/design-iterate`, `sdlc-init-phase-4` | The render, screenshot, critique, fix, re-verify loop behind `/design-iterate` |
+| `wcag-audit-checklist.md` | `a11y-compliance`, `/a11y` | WCAG 2.2 manual audit, run after the automated axe-core/pa11y/Lighthouse pass |
 
 ---
 
