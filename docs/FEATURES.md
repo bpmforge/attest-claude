@@ -462,7 +462,7 @@ Four MCP servers extend agent capability beyond the session context window. For 
 
 ### `bpm-memory-mcp` — Cross-session project memory
 
-Persistent memory store backed by SQLite + vector embeddings (LM Studio nomic-embed-text). Provides hybrid search (vector 35% + BM25 35% + link traversal 30%).
+Persistent memory store backed by SQLite + vector embeddings. The embedder comes from `~/.claude-memory/config.json`; with no file it is Ollama with `nomic-embed-text`, and with no reachable embedder recall is keyword-only. Provides hybrid search (vector 35% + BM25 35% + link traversal 30%).
 
 Registered by `install.sh` via `claude mcp add memory node <path>` (user scope) — it clones and builds `~/Code/bpm-memory-mcp` as needed.
 
@@ -483,7 +483,7 @@ Types: `decision`, `fact`, `pattern`, `error`, `preference`. Scope: `project` (d
 
 ### `bpm-code-search-mcp` — Semantic + symbol code search
 
-MCP server providing semantic search over code chunks (embedding-based) and a structural symbol index. Built on SQLite + FTS5 + cosine similarity. Provider-sticky: the embedding provider used at index time is locked in; queries from a different provider fall back to FTS5 BM25.
+MCP server providing semantic search over code chunks (embedding-based) and a structural symbol index. Built on SQLite + FTS5 + cosine similarity. Embedder-sticky: the provider, model and vector dimension used at index time are recorded; if any of them changes, `code_search` and `code_index` refuse until `code_index(force=true)` rebuilds the index. Building an index needs a reachable embedder; once built, search degrades to keyword-only if the embedder goes away.
 
 Source: `~/Code/bpm-code-search-mcp/`. Registered by `install.sh` via `claude mcp add code-search node <path>` (user scope); a PostToolUse hook in `~/.claude/settings.json` auto-reindexes edited files.
 
