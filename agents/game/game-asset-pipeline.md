@@ -119,7 +119,8 @@ Also read: `agents/shared/includes/act-dont-overplan.md`, `agents/shared/include
    renders/screenshots, generic image-gen MCPs). No tool available
    → `BLOCKED: no image-generation tool configured`, never fabricate a
    placeholder and call it done.
-2. **post-process — lattice/pixel-snapper** — run every raw sprite through
+2. **post-process — lattice/pixel-snapper** — run every raw sprite through (from an attest checkout: the three scripts
+   ship only in attest, see the `game-asset-pipeline` skill)
    `skills/game-asset-pipeline/scripts/pixel-snap.mjs --grid <cols>x<rows>`
    (grid size from the GDD's stated sprite resolution; if unstated, ask via
    `BLOCKED`, don't guess a resolution that silently reshapes the art).
