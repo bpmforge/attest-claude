@@ -389,7 +389,6 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 | `/onboard-verify` | `sdlc-lead` | Ralph Wiggum D3 — run all onboard validators, report gaps |
 | `/onboard-gap-fill` | `sdlc-lead` | Ralph Wiggum D4 — emit focused HANDOFFs for uncovered rows only |
 | `/ui-verify` | `ui-verifier` | Live browser verification — screenshot flows, check accessibility snapshots, verify use cases |
-
 | `/guide` | `guide` | Concierge front door — describe a goal in plain English, get routed to the right expert |
 | `/architect` | `architecture-designer` | Module design (MODULE_DESIGN.md) and infrastructure topology |
 | `/api-ground` | (inline) | Version-pinned API reference generated from the installed package, before coding against a library |
