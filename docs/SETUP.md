@@ -10,7 +10,7 @@ Step-by-step setup for a new machine. Covers prerequisites, installation, MCP co
 |-------------|---------|-------|
 | **Node.js** | 20–24 LTS | `install.sh` will prompt to install via NVM if wrong version |
 | **git** | Any | For cloning MCPs |
-| **jq** | Any | For `opencode.json` merges (macOS: `brew install jq`) |
+| **jq** | Any | Used by the hooks to read tool-call JSON (macOS: `brew install jq`) |
 | **Claude Code CLI** | Latest | `npm install -g @anthropic-ai/claude-code` |
 
 Optional but recommended:
