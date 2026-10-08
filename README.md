@@ -127,7 +127,7 @@ Prefer to track `main` by hand? `git pull && ./install.sh --yes` still works —
 - [docs/FEATURES.md](docs/FEATURES.md) — full agent, skill, validator, and protocol catalog
 - [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md) — MCP configuration (`claude mcp add` / `.mcp.json`)
 - [docs/SDLC_GUIDE.md](docs/SDLC_GUIDE.md) — SDLC workflow, phases, git model
-- [Releases](https://github.com/bpmforge/attest-claude/releases) — release notes for each version; [CHANGELOG.md](CHANGELOG.md) has full entries for 1.x and 3.4.0 onward, and a per-tag summary table for 2.x–3.3.1
+- [Releases](https://github.com/bpmforge/attest-claude/releases) — release notes for each version; [CHANGELOG.md](CHANGELOG.md) has full entries up to 1.26.3 and from 3.4.0 onward, and a per-tag summary table for 1.26.4–3.3.1
 
 ## License
 
