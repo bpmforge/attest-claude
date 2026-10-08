@@ -26,7 +26,10 @@ state="${TMPDIR:-/tmp}/attest-gateguard-$session"
 ttl=1800
 now=$(date +%s)
 if [ -f "$state" ]; then
-  mtime=$(stat -f %m "$state" 2>/dev/null || stat -c %Y "$state" 2>/dev/null || echo "$now")
+  # GNU first: GNU `stat -f` is --file-system, which prints a filesystem report to
+  # stdout before failing on "%m", so BSD-first left that report in $mtime on Linux
+  # and the TTL never expired. BSD stat rejects -c with no stdout.
+  mtime=$(stat -c %Y "$state" 2>/dev/null || stat -f %m "$state" 2>/dev/null || echo "$now")
   [ $((now - mtime)) -ge $ttl ] && rm -f "$state"
 fi
 # Hash the path: raw paths broke `grep -x` on newlines (a multi-line path matched its first line).
