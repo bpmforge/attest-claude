@@ -8,7 +8,7 @@ arguments:
     description: File, directory, or git diff to review (optional, defaults to full codebase)
     required: false
   - name: --review
-    description: Default — full 7-dimension health pass → docs/reviews/CODE_REVIEW_<date>.md
+    description: Default — full 9-dimension health pass → docs/reviews/CODE_REVIEW_<date>.md
     required: false
   - name: --debt
     description: Tech-debt catalog sorted by leverage → docs/reviews/TECH_DEBT_<date>.md
@@ -25,7 +25,7 @@ Triggers the **code-reviewer** subagent.
 
 Reviews code for **code health** — maintainability, patterns, tech debt, complexity, duplication, error handling, type invariants, naming, and comment accuracy. Distinct from security audit (vulnerabilities) and performance profiling (use `/security` and `/perf`).
 
-**The 8 dimensions scored on every `--review`:**
+**The 9 dimensions scored on every `--review`:**
 1. Complexity (function/file length, nesting, cyclomatic)
 2. Duplication / DRY (copy-paste ratio, missing abstractions)
 3. Error Handling (silent failures, broad catches, missing context)
@@ -34,6 +34,7 @@ Reviews code for **code health** — maintainability, patterns, tech debt, compl
 6. Naming Quality (intent-revealing, booleans-as-questions)
 7. Comment Accuracy (comments match code behavior)
 8. Dead / Unutilized Code (stubs, never-called functions, unused exports, orphan files, disconnected pipelines)
+9. Tech-Stack Compliance (every dependency in TECH_STACK.md; no new tech introduced outside the design)
 
 **Outputs:**
 - `--review` → `docs/reviews/CODE_REVIEW_<date>.md` (Health Dashboard + findings + verdict)

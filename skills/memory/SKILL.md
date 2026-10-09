@@ -1,3 +1,8 @@
+---
+name: memory
+description: 'Cheat sheet for the bpm-memory-mcp tools (memory_store, memory_recall, memory_feedback, memory_update, session_restore, session_save): what to store, when to recall, and the per-session flow. Use at session start and end, and before architecture decisions or repeating past work.'
+---
+
 # Memory Skill
 
 Use persistent memory to maintain context across sessions.

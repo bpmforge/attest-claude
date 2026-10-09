@@ -116,7 +116,7 @@ These directories are gitignored by default — they are per-project generated r
 
 Gates run in two forms, depending on whether the artifact is mechanically validatable:
 
-**Automated validators** (deterministic coverage checks) — `scripts/validators/` has 55 validators plus gate orchestrators. Used for any artifact where "covered or not" is an objective question: architecture diagrams, OWASP tracker rows, API route coverage, ERD table coverage, sequence-diagram coverage, inventory-row coverage, post-HANDOFF scope + manifest. Each returns exit 0 (clean) / 1 (gap) / 2 (validator errored). The `/gate` skill wraps `validate-phase-gate.sh <phase>` for the active phase.
+**Automated validators** (deterministic coverage checks) — `scripts/validators/` has 79 validators plus gate orchestrators. Used for any artifact where "covered or not" is an objective question: architecture diagrams, OWASP tracker rows, API route coverage, ERD table coverage, sequence-diagram coverage, inventory-row coverage, post-HANDOFF scope + manifest. Each returns exit 0 (clean) / 1 (gap) / 2 (validator errored). The `/gate` skill wraps `validate-phase-gate.sh <phase>` for the active phase.
 
 **Confidence gates** (subjective 1-10 score) — used only for artifacts validators cannot check mechanically: narratives, research summaries, rationale. Asymmetric:
 - Score < 5 on any dimension = automatic fail, surface the gap, do NOT iterate
@@ -392,14 +392,14 @@ Reports use the skeleton-first format — actionable intel first, verbatim code 
 Modes: `--review` (default), `--debt`, `--consolidate`, `--patterns`
 
 ```
-/review-code                    # full 7-dimension health pass
+/review-code                    # full 9-dimension health pass
 /review-code --debt             # leverage-sorted tech-debt register
 /review-code --consolidate      # DRY + error-handling consolidation proposals
 /review-code --patterns         # cross-codebase pattern drift audit
 /review-code src/auth/          # target a specific directory
 ```
 
-The 7 dimensions: Complexity, Duplication/DRY, Error Handling (silent-failure hunter), Type Safety, Pattern Consistency, Naming, Comment Accuracy. Verdict rubric: APPROVED / APPROVED WITH SUGGESTIONS / NEEDS REVISION / REJECT.
+The 9 dimensions: Complexity, Duplication/DRY, Error Handling (silent-failure hunter), Type Safety, Pattern Consistency, Naming, Comment Accuracy, Dead/Unutilized Code, Tech-Stack Compliance (the anti-slop auditor runs alongside them). Verdict rubric: APPROVED / APPROVED WITH SUGGESTIONS / NEEDS REVISION / REJECT.
 
 Reference: `references/code-health-checklist.md`. Output: `docs/reviews/`.
 

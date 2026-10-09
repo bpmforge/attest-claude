@@ -1,6 +1,6 @@
 # attest-claude
 
-Expert agent system for [Claude Code](https://claude.ai/code) — 39 primary expert agents + 31 cluster specialists (security, code-review, performance, onboarding, game dev), 27 skills, a 4-mode SDLC workflow, full git lifecycle management, and 55 automated validators that enforce quality gates at every phase.
+Expert agent system for [Claude Code](https://claude.ai/code) — 39 primary expert agents + 36 cluster specialists (security, code-review, performance, onboarding, game dev), 37 skills, a 4-mode SDLC workflow, full git lifecycle management, and 79 automated validators that enforce quality gates at every phase.
 
 **Not sure which command to run? Just describe your goal:** `/guide` is the front door — it routes any plain-English goal ("securely check all my source and help fix the issues", "this codebase is unfamiliar", "harden before launch") to the right expert and drives the workflow, always offering the next step.
 
@@ -35,7 +35,7 @@ That gives you **`main`** — the newest state, which can contain work landed si
 **To install a specific release instead** (pick the version from [Releases](https://github.com/bpmforge/attest-claude/releases)):
 
 ```bash
-git clone --branch v3.1.25 --depth 1 https://github.com/bpmforge/attest-claude.git
+git clone --branch v3.12.0 --depth 1 https://github.com/bpmforge/attest-claude.git
 cd attest-claude
 ./install.sh
 ```
@@ -44,15 +44,15 @@ Or, in a clone you already have:
 
 ```bash
 git fetch --tags
-git checkout v3.1.25   # prints a "detached HEAD" notice — that is expected
+git checkout v3.12.0   # prints a "detached HEAD" notice — that is expected
 ./install.sh
 ```
 
-**`main` vs a tag:** `main` moves with every push; a tag (`v3.1.25`) always points at the same commit. Use a tag when you want a fixed state; use `main` for the newest work. The "detached HEAD" notice is normal and installing works fine — you only need a branch if you intend to edit: `git checkout -b my-fix v3.1.25`. Go back to the latest with `git checkout main && git pull`.
+**`main` vs a tag:** `main` moves with every push; a tag (`v3.12.0`) always points at the same commit. Use a tag when you want a fixed state; use `main` for the newest work. The "detached HEAD" notice is normal and installing works fine — you only need a branch if you intend to edit: `git checkout -b my-fix v3.12.0`. Go back to the latest with `git checkout main && git pull`.
 
-This repo is generated from [attest](https://github.com/bpmforge/attest) and its tags track that repo's, so `v3.1.25` here is the Claude build of attest `v3.1.25`.
+This repo is generated from [attest](https://github.com/bpmforge/attest) and its tags track that repo's, so `v3.12.0` here is the Claude build of attest `v3.12.0`.
 
-Symlinks agents, skills, hooks, references, and scripts into `~/.claude/` and registers the MCP servers. Useful flags: `--yes` (non-interactive), `--compact` (compact agent variants for 32k local models), `--tools` (install the optional code-analysis tools — semgrep, knip, vulture, mmdc, …), `--no-memory`, `--no-code-search`, `--no-playwright-search`. Requires macOS, Linux, or WSL2.
+Symlinks agents, skills, references, and scripts into `~/.claude/`, copies the hooks (they must be executable files, and stay inactive until you add the `settings.json` entries the installer prints), and registers the MCP servers. Useful flags: `--yes` (non-interactive), `--compact` (compact agent variants for 32k local models), `--tools` (install the optional code-analysis tools — semgrep, knip, vulture, mmdc, …), `--no-memory`, `--no-code-search`, `--no-playwright-search`, `--no-playwright-mcp`, `--version`. Requires macOS, Linux, or WSL2.
 
 **Verify the install:**
 
@@ -98,23 +98,25 @@ Prefer to track `main` by hand? `git pull && ./install.sh --yes` still works —
 
 | Category | Count |
 |----------|-------|
-| Primary agents | 34 |
+| Primary agents | 39 |
 | Security micro-agents | 9 |
 | Code-review micro-agents | 8 |
 | Performance micro-agents | 6 |
 | SDLC onboard specialists | 4 |
-| Game-dev cluster | 4 |
-| **Total agents** | **65** |
-| Skills | 26 |
-| Shared protocols | 17 |
-| Validators | 55 |
+| Game-dev cluster | 9 |
+| SDLC mode agents | 9 |
+| **Total agents** | **84** |
+| Skills | 37 |
+| Shared protocols | 38 |
+| Validators | 79 |
+| Hooks | 12 |
 | MCPs (auto-installed) | 4 |
 
 ## Highlights
 
 - **`/guide` concierge** — front door that routes any goal to the right expert.
 - **Security find-and-fix** — `/security --fix` drives a verified loop (fix → re-scan to confirm closed via `scripts/fix-verify.mjs`).
-- **8-dimension code health** including a dead-code/stub/unused-export detector.
+- **9-dimension code health** including a dead-code/stub/unused-export detector.
 - **Deterministic scaffolding** — `run-plan.mjs` (DAG runner), `fix-verify.mjs` (re-verify gate), `mermaid-fix.mjs` + render-validated diagrams.
 - **Any LLM** — tier detection, compact agent variants (install with `--compact`), capability-probed delegation.
 
@@ -125,7 +127,7 @@ Prefer to track `main` by hand? `git pull && ./install.sh --yes` still works —
 - [docs/FEATURES.md](docs/FEATURES.md) — full agent, skill, validator, and protocol catalog
 - [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md) — MCP configuration (`claude mcp add` / `.mcp.json`)
 - [docs/SDLC_GUIDE.md](docs/SDLC_GUIDE.md) — SDLC workflow, phases, git model
-- [Releases](https://github.com/bpmforge/attest-claude/releases) — release notes for each version (the per-release detail lives in the annotated tag; `CHANGELOG.md` covers 1.x only)
+- [Releases](https://github.com/bpmforge/attest-claude/releases) — release notes for each version; [CHANGELOG.md](CHANGELOG.md) has full entries up to 1.26.3 and from 3.4.0 onward, and a per-tag summary table for 1.26.4–3.3.1
 
 ## License
 

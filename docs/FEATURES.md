@@ -4,17 +4,18 @@ This document describes what every agent, skill, reference document, validator, 
 
 ## Table of contents
 
-- [Agents (65)](#agents)
-  - [Primary agents (22)](#primary-agents)
+- [Agents (84)](#agents)
+  - [Primary agents (39)](#primary-agents)
   - [Security micro-agents (9)](#security-micro-agents)
   - [Code-review micro-agents (8)](#code-review-micro-agents)
   - [Performance micro-agents (6)](#performance-micro-agents)
   - [SDLC onboard specialists (4)](#sdlc-onboard-specialists)
-  - [SDLC mode agents](#sdlc-mode-agents)
-- [Skills (27)](#skills)
-- [Shared protocols (24)](#shared-protocols)
+  - [Game-dev cluster (9)](#game-dev-cluster)
+  - [SDLC mode agents (9)](#sdlc-mode-agents)
+- [Skills (37)](#skills)
+- [Shared protocols (38)](#shared-protocols)
 - [Memory & code-search MCPs](#memory--code-search-mcps)
-- [Validators](#validators)
+- [Validators (79)](#validators)
 - [Depth modes](#depth-modes-v0150)
 - [Platform support](#platform-support)
 - [Reference documents](#reference-documents)
@@ -124,7 +125,7 @@ OWASP Top 10, threat modeling, Semgrep scans, dependency audits. Runs as 5-phase
 
 Four user modes (`--review`, `--debt`, `--consolidate`, `--patterns`), executed as 4-phase orchestrator internally: understand → tooling → review passes → report.
 
-Reviews across **8 dimensions**: complexity, duplication, error handling, type invariants, patterns, naming, comment accuracy, and anti-slop (threshold ≥ 8). The anti-slop dimension checks for AI-generated bloat patterns cataloged in ANTI_SLOP_RULES.md.
+Reviews across **9 dimensions**, the set the `/review-code` skill and the `code-reviewer` agent score: complexity, duplication, error handling, type invariants, patterns, naming, comment accuracy, dead/unutilized code, and tech-stack compliance (deps match TECH_STACK.md; no tech outside the design). The `anti-slop-auditor` runs alongside them on every review and checks for the AI-generated bloat patterns cataloged in ANTI_SLOP_RULES.md (threshold ≥ 8); its findings feed the synthesizer, but it is not one of the nine scored dimensions.
 
 ### `ux-engineer` — UX design & accessibility (`mode: primary`)
 
@@ -230,6 +231,30 @@ Called by `sdlc-lead` in Phase 3 (Design), after `db-architect` and before `codi
 
 ---
 
+### More primary agents
+
+Seventeen more primary agents, one line each (the agent file in `agents/` is the full spec):
+
+| Agent | Purpose |
+|-------|---------|
+| `a11y-compliance` | Accessibility and compliance audit: WCAG 2.2 AA/AAA, ATAG, EN 301 549 / European Accessibility Act, Section 508; remediation with file:line |
+| `analytics-architect` | Telemetry and instrumentation design: signal selection (RED/USE/golden signals), event taxonomy, observability spec, dashboards |
+| `app-cartographer` | End-user guide pipeline, step 1: page-graph state inventory and per-state interactive-element inventory of a running app |
+| `changelog-writer` | Reads a git log range and writes Keep-a-Changelog entries |
+| `content-designer` | Writes the UI text (labels, empty states, errors, confirmations, onboarding copy) as a reviewable spec before implementation |
+| `cost-engineer` | Cloud and LLM spend analysis, right-sizing, commitments, cost observability |
+| `data-steward` | Data governance: PII classification, GDPR/CCPA/PIPEDA obligations, retention, encryption mapping, data-subject rights |
+| `design-iterator` | Visual design loop: render, screenshot, critique against `docs/design/tokens.json`, fix, re-verify (`/design-iterate`) |
+| `design-system-lead` | Pre-code token spec (`docs/design/tokens.json`) and component inventory (`docs/design/components.md`) |
+| `documentation-gap-finder` | Lists undocumented exports and endpoints, stale doc references, and doc coverage |
+| `gauntlet-lead` | Gauntlet loop: sets a real reference bar, dispatches builders and blind fresh-per-round critics until every unit beats it (`/gauntlet`) |
+| `guide-scribe` | End-user guide pipeline, step 2: replayable step specs, gated annotated screenshots, error triage |
+| `manual-writer` | End-user guide pipeline, step 3: assembles the Diátaxis-shaped user manual |
+| `migration-planner` | Compares two schema states and produces ordered migration steps with a rollback per step |
+| `qa-vnv-engineer` | QA and V&V: automated, evidence-producing validation of the real rendered app |
+| `reliability-engineer` | Load testing and resilience: k6/Locust/vegeta strategy, chaos scenarios, circuit breakers, retries, graceful degradation |
+| `ux-researcher` | Turns personas and user stories into user-flow diagrams and a screen inventory before any wireframe or token work |
+
 ### Security micro-agents
 
 Live in `agents/security/`. Dispatched by `security-auditor` (coordinator) via HANDOFF — each runs in its own context window and writes findings to `docs/work/security/<slug>.md`.
@@ -252,17 +277,17 @@ Methodology docs: `OWASP_METHODOLOGY.md`, `OWASP_LLM_METHODOLOGY.md`, `CLOUD_MET
 
 ### Code-review micro-agents
 
-Live in `agents/code-review/`. Dispatched by `code-reviewer` (coordinator) in parallel — each covers one review dimension.
+Live in `agents/code-review/`. Dispatched by `code-reviewer` (coordinator) in parallel. Tech-stack compliance has no micro-agent: the coordinator runs `validate-tech-stack.sh` itself. The anti-slop auditor is an extra pass, not a scored dimension.
 
-| Agent | Dimension |
+| Agent | Covers |
 |-------|-----------|
 | `complexity-analyzer` | Cyclomatic complexity, nesting depth, cognitive load |
 | `duplication-detector` | Copy-paste patterns, near-duplicate logic, DRY violations |
 | `error-handling-auditor` | Silent failures, over-broad catch, missing boundary validation |
 | `type-safety-checker` | Any-cast abuse, non-null assertions, unsafe type coercions |
 | `pattern-consistency-checker` | Naming, import style, module structure — deviation from project conventions |
-| `anti-slop-auditor` | 20-rule AI slop catalog (R-01..R-20): bloat, dead code, speculative abstractions, generated filler |
-| `dead-code-detector` | Unimplemented stubs, never-called functions, unused exports, orphan files, disconnected pipelines (tool-first: knip/ts-prune/vulture/staticcheck + grep) |
+| `anti-slop-auditor` | 31-rule AI slop catalog (R-01..R-31): bloat, speculative abstractions, generated filler, slopsquatting, credential leakage |
+| `dead-code-detector` | Unimplemented stubs, never-called functions, unused exports, orphan files, disconnected pipelines, unreachable branches (tool-first: knip/ts-prune/vulture/staticcheck + grep fallback) |
 | `code-health-synthesizer` | Coordinator synthesizer — reads all seven micro-agent outputs, produces `HEALTH_ASSESSMENT.md` with prioritized backlog |
 
 Methodology: `agents/code-review/METHODOLOGY.md` — per-dimension grading rubrics, severity escalation rules, FIX_BACKLOG format.
@@ -299,6 +324,24 @@ Live in `agents/sdlc/onboard/`. Dispatched by `sdlc-onboard-mode` (coordinator) 
 
 ---
 
+### Game-dev cluster
+
+Live in `agents/game/`. Activated by the `/sdlc init "<name>" "<desc>" --game` flavor (swaps SRS→GDD, inserts a vertical-slice gate before content production). Reuse the generic engineering experts (coding-agent, perf, test, frontend) for everything else.
+
+| Agent | Purpose |
+|-------|---------|
+| `game-designer` | Core loop first, 3 pillars, lose-loop design; produces the GDD (Game Design Document, the SRS equivalent) with SLICE/POST-SLICE scoping |
+| `gameplay-engineer` | Engine-grain implementation (Godot/Unity/Phaser/Bevy): frame budget, fixed-timestep vs render FPS, allocation discipline, input buffering, determinism |
+| `game-balance-designer` | Progression curves, economy sinks/sources; **simulates 1000 player-sessions** as a rerunnable script before shipping numbers |
+| `playtest-evaluator` | Blind-first playtest of the vertical slice; 6 fun heuristics with evidence, time-to-first-success vs the slice acceptance test |
+| `game-asset-pipeline` | Sprite batch micro-loop: gen → lattice/pixel-snapper cleanup + transparency de-fringe (deterministic scripts, run from an attest checkout) → sprite-sheet pack → portable TexturePacker-hash atlas manifest for engine import |
+| `game-producer` | Lifecycle gates on builds (prototype kill-criteria, vertical slice, alpha feature-lock, beta content-lock, cert, gold), milestones, scope control |
+| `level-designer` | Player flow, encounter design, blockout/greybox discipline, pacing beat charts |
+| `narrative-designer` | Story delivered through systems: branching structure, quest logic, barks, environmental storytelling, dialogue data formats |
+| `game-audio-designer` | Sonic direction, SFX/music/VO planning, middleware choice (FMOD/Wwise vs engine-native), mix rules, memory/voice budgets |
+
+---
+
 ### SDLC mode agents
 
 Thin orchestrators that drive each SDLC phase. Read by `sdlc-lead` on demand.
@@ -313,6 +356,7 @@ Thin orchestrators that drive each SDLC phase. Read by `sdlc-lead` on demand.
 | `sdlc-feature-mode` | Mode 3: add a feature to an existing project |
 | `sdlc-improve-mode` | Mode 4: audit-driven improvement |
 | `sdlc-onboard-mode` | Mode 2: understand an existing codebase — thin dispatcher to onboard specialists |
+| `sdlc-init-phases-3-4` | Superseded by `sdlc-init-phase-3` and `sdlc-init-phase-4`; kept only so older doc references resolve |
 
 ---
 
@@ -326,7 +370,7 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 | `/code` | `coding-agent` | Implement from SDLC design docs — API verification, anti-slop enforcement, tech stack compliance |
 | `/git-expert` | `git-expert` | Git lifecycle (init / feature / release / recover / inspect / sync) |
 | `/security` | `security-auditor` | OWASP audit, threat model, Semgrep scan |
-| `/review-code` | `code-reviewer` | Code health review (review / debt / consolidate / patterns) |
+| `/review-code` | `code-reviewer` | 9-dimension code health review incl. dead/unused-code + tech-stack compliance (review / debt / consolidate / patterns) |
 | `/research` | `researcher` | Deep research with source evaluation |
 | `/test-expert` | `test-engineer` | Test strategy, unit/e2e tests, coverage |
 | `/perf` | `performance-engineer` | Profile, benchmark, optimize |
@@ -340,14 +384,27 @@ Skills are thin triggers that live in `skills/<name>/SKILL.md`. Each skill maps 
 | `/simplify` | `code-reviewer` | Simplification-focused pass on recent changes |
 | `/explore` | `sdlc-lead` (inline) | Codebase archaeology — trace a feature end-to-end, map blast radius |
 | `/design-options` | `sdlc-lead` (inline) | Generate 2-3 architecture alternatives with trade-offs before committing |
-| `/frontend` | `frontend-design` | Visual polish, design tokens, typography, color, spacing, motion |
 | `/steward` | `sdlc-lead` (inline) | Audit CLAUDE.md / AGENTS.md alignment, capture session learnings |
 | `/onboard-inventory` | `researcher` | Ralph Wiggum D1 — enumerate units into `docs/onboard/INVENTORY.md` |
 | `/onboard-verify` | `sdlc-lead` | Ralph Wiggum D3 — run all onboard validators, report gaps |
 | `/onboard-gap-fill` | `sdlc-lead` | Ralph Wiggum D4 — emit focused HANDOFFs for uncovered rows only |
 | `/ui-verify` | `ui-verifier` | Live browser verification — screenshot flows, check accessibility snapshots, verify use cases |
+| `/guide` | `guide` | Concierge front door — describe a goal in plain English, get routed to the right expert |
+| `/architect` | `architecture-designer` | Module design (MODULE_DESIGN.md) and infrastructure topology |
+| `/api-ground` | (inline) | Version-pinned API reference generated from the installed package, before coding against a library |
+| `/pre-code` | (inline) | Pre-flight checklist before the first edit in an existing codebase |
+| `/a11y` | `a11y-compliance` | WCAG 2.2 / EN 301 549 / Section 508 audit with criterion + file:line + fix |
+| `/analytics` | `analytics-architect` | Telemetry and instrumentation design, event taxonomy, dashboards |
+| `/cost` | `cost-engineer` | Cloud + LLM spend audit, right-sizing, unit economics |
+| `/data-governance` | `data-steward` | PII classification, GDPR/CCPA/PIPEDA obligations, retention, erasure paths |
+| `/reliability` | `reliability-engineer` | Load testing and resilience: failure-mode matrices, chaos scenarios, circuit breakers |
+| `/design-iterate` | `design-iterator` | Render → screenshot → critique against tokens.json → fix → re-verify |
+| `/gauntlet` | `gauntlet-lead` | Builders never grade their own work; blind critics grade against a real reference bar |
+| `/game-asset-pipeline` | (scripts) | Deterministic cleanup, de-fringing and atlas packing for generated pixel-art sprites, using three `sharp`-based scripts run from an attest checkout |
+| `/vault` | (inline) | Query, ingest into and lint the agent-brain-vault project wiki |
+| `memory` | (reference) | How to use the memory MCP across sessions (no slash trigger) |
 
-**27 skills total** (includes `/guide` — the concierge front door).
+**37 skills total.** The opencode-only wrapper skills (`/frontend`, `/challenge`, `/migration-planner`, `/documentation-gap-finder`, `/llm-integration`, `/end-user-simulator`, `/release`) have no Claude Code skill: their agents ship in `agents/` and are reached through the Task tool. `/reflow` (attest's own ticket board) and `/user-guide` (a placeholder) are opencode-only by design, and `/wave`, `/goal` and `/autopilot` are not ported yet.
 
 ---
 
@@ -365,7 +422,7 @@ Canonical reference files in `agents/shared/`. Single source of truth — `insta
 | `RALPH_WIGGUM_LOOP.md` | Canonical inventory-driven deep-verification loop used by `/sdlc onboard --deep` and `/security --deep` |
 | `LOOP_PREVENTION.md` | Tool-selection cheat-sheet + three loop classes (failure / schema-validation / success) + BLOCKED-template |
 | `RESEARCH_TOOLS.md` | Mandatory research-tool surface and fallback chain (`playwright-search` → `pullmd` → STOP) |
-| `ANTI_SLOP_RULES.md` | 20-rule AI slop catalog (R-01..R-20) — over-engineering, defensive bloat, hallucinated patterns, generated filler |
+| `ANTI_SLOP_RULES.md` | 31-rule AI slop catalog (R-01..R-31) — over-engineering, defensive bloat, hallucinated patterns, slopsquatting, credential leakage |
 | `CHALLENGER_PROTOCOL.md` | Full Challenger adversarial review protocol — challenge categories, severity grades, rebuttal cycle, output format |
 | `GATE_SCORING_PROTOCOL.md` | HANDOFF resume scoring (1–10 scale, asymmetric threshold ≥7 pass / 5–6 revise / <5 auto-fail) + coverage validator table |
 | `PHASE_ROUTING_PROTOCOL.md` | Smart routing table per phase, escape hatches, validation gate chain, two-track system (Track 1: coverage loop; Track 2: confidence loop) |
@@ -381,6 +438,20 @@ Canonical reference files in `agents/shared/`. Single source of truth — `insta
 | `BOOK_PROTOCOL.md` | Canonical rule for structuring long-form deliverables (> 300 lines) as multi-page books with index navigation (enforced by `validate-book-structure.sh`) |
 | `CODE_BOOK_PROTOCOL.md` | The book protocol applied to code: a source file over the size cap becomes a directory (index/barrel + one-concern chapter modules); enforced by `validate-file-size.sh` |
 | `BROWSER_TESTING.md` | Browser-automation / E2E primer — when and how to use `playwright-mcp` for screenshots and runtime UI verification |
+| `AUTONOMY_PROTOCOL.md` | Autonomy level (interactive|auto) — in auto, gated pauses take documented defaults + log to APPROVALS.md; enumerated NEVER-AUTO list always pauses (destructive ops, merges/releases, tech-stack adds, behavior-changing security fixes) |
+| `CHECKPOINT_STATE.md` | Context checkpoint: write a compact `docs/work/STATE.md` after each step so the user can `/clear` and resume; the catch-up read-list `/sdlc resume` rehydrates from |
+| `CODE_SEARCH.md` | The `code-search` MCP surface (symbol/reference index): `code_symbols`/`code_references`/`code_outline`/`code_search` + `code_index`, when to prefer it over grep, and the mandatory `code_index()`-then-grep-fallback freshness contract. Inlined as the `## Code search` block into code-heavy agents |
+| `CONTAINER_RUNTIMES.md` | Runtime detection and cloud-portability knowledge behind container-ops — which CLI/compose flavor is present, rootless gotchas, multi-arch, GCP/AWS-portable images |
+| `GAME_PRODUCTION.md` | How games are actually produced, indie and AAA — lifecycle gates on builds, discipline map and indie role-collapse, the artifacts that matter |
+| `GAME_TOOLING.md` | Game-tool MCP landscape and agentic engine loops for the game cluster — maintained engine/art/audio MCP servers and how to wire them |
+| `GAUNTLET_LOOP.md` | The `/gauntlet` harness: a real reference bar, builders in clean context, blind fresh-per-round critics; the builder never grades its own work |
+| `GUIDE_CAPTURE.md` | Guide-capture protocol (T21.1): how a running expert records a reusable "guide" (playbook bullet + matched lesson) so the next run pre-briefs from captured knowledge instead of cold-starting |
+| `PERSISTENCE.md` | Anti-announce-then-stop rule — never end a turn after announcing an action; perform it or print `BLOCKED:`. The prompt-side fix for the #1 accidental pause (~+20% SWE-bench) |
+| `PRODUCT_SHAPE_PROTOCOL.md` | Canonical orchestration role names (GOAL / ORCHESTRATOR / BOTS / REVIEW PANEL / HONESTY LOOPS), the two-stack rule, the feature-map planning artifact, and feature-grouped landing |
+| `QA_VNV_TESTING.md` | Runnable QA/V&V technique library for qa-vnv-engineer — layout-defect detection, visual regression, resilient journey automation, evidence reporting |
+| `SDLC_RESUME_PROTOCOL.md` | Deterministic resume of an incomplete SDLC (`status: partial`): gate-verify every claimed-complete phase, then give each artifact a disposition (locked / repair / redo) before continuing |
+| `TOOL_PREFLIGHT.md` | Enforced tool-preflight + diagnose-before-retry contract for agents that run external scanners and profilers (semgrep, checkov, trivy, py-spy, lizard, jscpd …) |
+| `TUI_SESSION_HYGIENE.md` | TUI session-hygiene protocol — thin orchestrator, mandatory fresh-context (Executor A/B, never inline D) dispatch for tool-heavy specialists, scan-output-to-disk hard rule, 70%-of-truthful-context-display checkpoint-and-resume |
 
 ---
 
@@ -390,7 +461,7 @@ Four MCP servers extend agent capability beyond the session context window. For 
 
 ### `bpm-memory-mcp` — Cross-session project memory
 
-Persistent memory store backed by SQLite + vector embeddings (LM Studio nomic-embed-text). Provides hybrid search (vector 35% + BM25 35% + link traversal 30%).
+Persistent memory store backed by SQLite + vector embeddings. The embedder comes from `~/.claude-memory/config.json`; with no file it is Ollama with `nomic-embed-text`, and with no reachable embedder recall is keyword-only. Provides hybrid search (vector 35% + BM25 35% + link traversal 30%).
 
 Registered by `install.sh` via `claude mcp add memory node <path>` (user scope) — it clones and builds `~/Code/bpm-memory-mcp` as needed.
 
@@ -411,7 +482,7 @@ Types: `decision`, `fact`, `pattern`, `error`, `preference`. Scope: `project` (d
 
 ### `bpm-code-search-mcp` — Semantic + symbol code search
 
-MCP server providing semantic search over code chunks (embedding-based) and a structural symbol index. Built on SQLite + FTS5 + cosine similarity. Provider-sticky: the embedding provider used at index time is locked in; queries from a different provider fall back to FTS5 BM25.
+MCP server providing semantic search over code chunks (embedding-based) and a structural symbol index. Built on SQLite + FTS5 + cosine similarity. Embedder-sticky: the provider, model and vector dimension used at index time are recorded; if any of them changes, `code_search` and `code_index` refuse until `code_index(force=true)` rebuilds the index. Building an index needs a reachable embedder; once built, search degrades to keyword-only if the embedder goes away.
 
 Source: `~/Code/bpm-code-search-mcp/`. Registered by `install.sh` via `claude mcp add code-search node <path>` (user scope); a PostToolUse hook in `~/.claude/settings.json` auto-reindexes edited files.
 
@@ -455,17 +526,17 @@ Install: `claude mcp add playwright -- npx -y @playwright/mcp@latest`
 
 ## Validators
 
-Fifty-five bash validators + gate runners in `scripts/validators/`. Each returns exit 0 (clean) / 1 (gaps) / 2 (validator error) and emits a JSON gap envelope to stdout. Bash 3.2 compatible (macOS default).
+Seventy-nine bash validators (plus gate runners) in `scripts/validators/`. Each returns exit 0 (clean) / 1 (gaps) / 2 (validator error) and emits a JSON gap envelope to stdout. Bash 3.2 compatible (macOS default).
 
 | Script | Checks |
 |--------|--------|
-| `validate-adrs.sh` | Every ADR-NNN reference in docs has a corresponding file with a valid status field |
+| `validate-adrs.sh` | Every ADR-NNN reference in docs has a corresponding file with a valid status field; a hard-to-reverse choice (datastore/auth-model/core-framework/vendoring-strategy) asserted in ARCHITECTURE.md/TECH_STACK.md has a matching, on-topic ADR (T29.5) |
 | `validate-api-coverage.sh` | Every route in source has a row in API_DESIGN.md and a path entry in openapi.yaml |
 | `validate-architecture.sh` | 6 diagram types, Mermaid syntax, HLA overview, no placeholders |
 | `validate-build.sh` | Runs project build command and checks exit code |
 | `validate-c3-coverage.sh` | Every source module appears in the C3 context diagram |
 | `validate-code-health.sh` | 9 anti-slop patterns: catch-all error handlers, try-in-loop, what-comments, unused imports, single-use helpers, speculative abstractions, hardcoded config, re-implemented framework features, scope creep |
-| `validate-completion-manifest.sh` | HANDOFF manifest schema + completion phrase |
+| `validate-completion-manifest.sh` | HANDOFF manifest schema + completion phrase, AND (T27.2 v2) Files-produced paths exist on disk, Verify-result cites a real artifact, Maker/Verifier identity present and distinct |
 | `validate-deps.sh` | npm audit / pip-audit / cargo audit with configured waivers |
 | `validate-design-system.sh` | Token file present, component files match UX_SPEC inventory, no hardcoded hex colors |
 | `validate-doc-counts.sh` | Every "<N> validators/skills/references" count claimed in README/docs is re-derived from the filesystem and matched (release-manager step 5, made deterministic) |
@@ -473,7 +544,7 @@ Fifty-five bash validators + gate runners in `scripts/validators/`. Each returns
 | `validate-entry-points.sh` | Every entry point (main, index, bin) is documented |
 | `validate-erd-coverage.sh` | Every table/model in source has an ERD entry |
 | `validate-fix-backlog-closed.sh` | CRITICAL and HIGH rows in FIX_BACKLOG resolved before phase-5 gate |
-| `validate-handoff-discipline.sh` | Every `task()`-shorthand delegation maps to a HANDOFF with a no-spawn fallback; no raw `Agent(...)`/`subagent_type` spawn bypasses the contract (runs in the git-expert merge gate when `agents/**.md` changes) |
+| `validate-handoff-discipline.sh` | Every `task()`-shorthand delegation maps to a HANDOFF with a no-spawn fallback; no raw `Agent(...)`/`subagent_type` spawn bypasses the contract, and concurrent `HANDOFF to:` dispatchers must gate on has_task_tool (runs in the git-expert merge gate when `agents/**.md` changes) |
 | `validate-iac.sh` | IaC scaffolding: entry/variables/outputs/per-env configs present, no hardcoded secrets |
 | `validate-infrastructure.sh` | INFRASTRUCTURE.md has env matrix, compute, data, networking + Mermaid diagram; rejects IaC code in the document |
 | `validate-inventory.sh` | Every row in INVENTORY.md has a corresponding artifact |
@@ -514,6 +585,30 @@ Fifty-five bash validators + gate runners in `scripts/validators/`. Each returns
 | `validate-resilience-patterns.sh` | Resilience patterns (retry, timeout, circuit-breaker, fallback) designed at Phase 3 |
 | `validate-tracker-fresh.sh` | Tracking-as-gate (G-D) — work changed but no tracker updated → fail; `--base` mode |
 | `validate-wcag-coverage.sh` | Accessibility (WCAG) evidence exists for UI-bearing components |
+| `validate-autonomy-ledger.sh` | APPROVALS.md rows are well-formed and every NEVER-AUTO row is human-signed (T27.5) — the runtime counterpart to `validate-autonomy-wiring.sh`'s prose-adjacency lint |
+| `validate-autonomy-wiring.sh` | Every by-design pause directive is autonomy-aware — carries the `AUTONOMY_PROTOCOL` gate or is marked NEVER-AUTO within ±5 lines, so `autonomy: auto` takes documented defaults instead of silently waiting |
+| `validate-challenger-gate.sh` | Any FIX_BACKLOG/review/security report with a CRITICAL or HIGH finding, or any ADR/design doc asserting an unverified external rationale, has a matching `CHALLENGE_REPORT_*.md` with zero unresolved CONTRADICTED verdicts (T27.3, T29.5) |
+| `validate-close-receipt.sh` | A ticket module `in_review`/`done` has the `close()` receipt pasted verbatim into its Completion Manifest — not just a self-asserted "`<id> done`" phrase (wraps `scripts/lib/tickets.mjs check-receipt`; the same check `accept()` itself enforces, T26.3) |
+| `validate-contract-conformance.sh` | Live app vs frozen `openapi` spec — every GET endpoint returns a declared 2xx with required JSON fields present; drift (spec route missing from the app) is a gap. SKIPs when no spec/base-url (wraps `scripts/contract-conformance.mjs`) |
+| `validate-design-tokens.sh` | Figma-source ↔ `tokens.json` drift (offline-safe; active only when `docs/design/figma-snapshot.json` exists): flags a Figma color dropped from `tokens.json`, a snapshot pulled but never derived, and (advisory) a color that diverged. No-op for the prose-authored `tokens.json` path (wraps `scripts/lib/design-tokens.mjs`; see `references/figma-adapter.md`) |
+| `validate-doc-render-health.sh` | Markdown-table orphan-fragment linter — a `\|`-delimited data row with no valid header/separator above it renders as literal pipe-text, not a table (T29.9) |
+| `validate-flows.sh` | `docs/design/flows.md` (ux-researcher's output, the ROOT of the design chain) is structurally sound: exists (unless headless), has at least one Mermaid flow diagram and a screen-inventory section, no placeholder text. Flags a missing flows.md only when downstream design artifacts (tokens.json/components.md/UX_SPEC.md) exist without their derivation root; skips clean before the design phase |
+| `validate-invariants.sh` | Enforces a project's declared cross-cutting invariants (e.g. every route goes through the audited-transaction seam) — catches violations a ticket's own tests pass |
+| `validate-jira-hygiene.sh` | Jira mirror hygiene (offline-safe; active only when `TRACKER_BACKEND=jira`): flags lifecycle ops queued in the durable outbox but not mirrored to Jira, and modules that advanced (claimed/in_progress/in_review/done) without a Jira sync. No-op for the `plan.json`-only path (wraps `scripts/lib/jira-hygiene.mjs`; see `references/jira-adapter.md`) |
+| `validate-model-pins.sh` | G3 config-pin lint (T30.1, M30 model-tier guard) — a frontier-tier model id hardcoded in agent frontmatter or repo config outside `models.json` is a hard gap ("pin roles, not models"); any other raw `model:`/`"model"` pin outside `models.json` warns without failing |
+| `validate-persistence-block.sh` | Every executor/coding agent carries the anti-announce-then-stop rule (`PERSISTENCE.md`), directly or via MODEL_ADAPTER/BOUNDED_TASK_CONTRACT — kills the #1 accidental pause |
+| `validate-qa-evidence.sh` | A qa-vnv-engineer V&V report is evidence-backed — traceability plus attached artifacts, not confident prose |
+| `validate-requirement-closure.sh` | Phase 4→5 REQUIREMENT closure (not task closure, T29.2): a story is closed only when ≥1 module's `stories[]` references it AND every referencing module is `done`; also requires the mandatory `docs/work/REQUIREMENT_RECONCILIATION.md` reconciliation matrix to cover every story with no `OUTSTANDING` verdict. Skips cleanly when `stories[]`/`docs/USER_STORIES.md` aren't adopted (wraps `scripts/lib/tickets.mjs requirement-status` + `scripts/lib/reconciliation-matrix.mjs`) |
+| `validate-rules.sh` | Lints the `rules/` primitive: every rule file has parseable frontmatter (`description`, boolean `alwaysApply`, and `globs` unless always-applied) |
+| `validate-scope.match.test.sh` | Self-test, not a gate: proves the real `_scope-match.sh` matcher accepts its positive cases and rejects its negative ones |
+| `validate-seams.sh` | Seam-record integrity for module boards: each shared contract has exactly one producer module, every consumer depends on it, and wiring evidence exists (wraps `validateSeams()` in `scripts/lib/tickets-seams.mjs`) |
+| `validate-spec-traceability.sh` | `docs/TRACEABILITY.md` grades every founding-brief requirement against the produced doc set + tickets (T22.15) |
+| `validate-state-drift.sh` | `docs/work/STATE.md`'s Done-section phase claims are backed by a real/waiver gate receipt (`docs/work/gates/<phase>-receipt.json`, T27.1) — used by `/sdlc resume` (warn) and `run-until-done.sh`'s outer loop (block completion) so a claimed-but-unreceipted phase can't be trusted (T27.4) |
+| `validate-status-freshness.sh` | A generated project `docs/work/STATUS.md` (T29.3, H7/C-1) is flagged stale when its embedded numbers mismatch a live recompute against `plan.json`, or predate the plan's own last work event (latest `history[]`/`claimed_at` timestamp). Not chained into a phase gate — advisory, the intended caller is the steward skill (wraps `scripts/gen-status-report.mjs --check`) |
+| `validate-ticket-hygiene.sh` | Ticket LIFECYCLE hygiene audit, distinct from graph validity — a `done` module missing complete history/evidence/manifest, an owner holding >1 open ticket, a claim open >7d, TICKETS.md/STATE.md status contradicting plan.json, and an evidence commit touching a file outside its write_scope or citing a commit absent from git history (wraps `scripts/lib/ticket-hygiene.mjs`, T26.2) |
+| `validate-tickets.sh` | Module-contract ticket graph integrity — malformed tickets, cyclic/dangling depends_on, orphan node refs, and overlapping write-scopes among active modules (wraps `scripts/lib/tickets.mjs`) |
+| `validate-tracker-integrity.sh` | External Tracker Data Model (T29.6, H5/A-6): `docs/TRACKER_DATA_MODEL.md` must exist before any `docs/work/tracker-snapshot.json`; once a snapshot exists, every non-stray item has its required label, every story is structurally linked to its phase, and no untagged template/sample item pollutes scope math. No-op for projects using only `plan.json` (wraps `scripts/lib/tracker-model.mjs`) |
+| `validate-vendor-provenance.sh` | Anti-slop R-30 (T29.8, field lesson B-2): a vendored/copied library module must be generated from the real upstream and record its provenance (source + version), not reimplemented from memory in a library's shape; a "vendored" file with dropped/renamed variants and no provenance marker is flagged as a silent fork |
 
 Route discovery covers Express/Fastify/Next.js app router/FastAPI/Flask/Go net-http. Table discovery covers Prisma/TypeORM/Sequelize/Knex/SQLAlchemy/Django/raw SQL.
 
@@ -552,7 +647,7 @@ Canonical checklists and templates agents read at runtime. Each is plain markdow
 | Reference | Used by | Purpose |
 |---|---|---|
 | `git-workflow-checklist.md` | `git-expert` | Conventional commits, SemVer, Keep-a-Changelog, recovery scenarios, report templates |
-| `code-health-checklist.md` | `code-reviewer` | 8 dimensions, silent-failure hunter, consolidation catalog, language thresholds |
+| `code-health-checklist.md` | `code-reviewer` | The 9 review dimensions, silent-failure hunter, consolidation catalog, language thresholds |
 | `owasp-checklist.md` | `security-auditor` | OWASP Top 10 + verification steps |
 | `semgrep-guide.md` | `security-auditor` | Semgrep setup, rule packs, two-tier scans |
 | `semgrep-community-rules.md` | `security-auditor` | Community rule inventory |
@@ -563,6 +658,31 @@ Canonical checklists and templates agents read at runtime. Each is plain markdow
 | `engineering-artifacts.md` | `sdlc-lead` | SDLC phase deliverables per phase |
 | `report-template.md` | all agents | Common report header + confidence footer |
 | `context7-mcp.md` | all agents | Live library docs via Context7 MCP |
+| `parallel-worktree-agent-playbook.md` | orchestrating session | Gotchas for briefing multiple agents on separate tickets concurrently: worktree isolation, git-stash cross-worktree collision, `--base origin/main`, `build-target-claude.mjs --out`, awk/bash portability traps, fixture/CHANGELOG/merge-gate conventions |
+| `jira-adapter.md` | orchestrating session, sdlc-lead | Mirror the ticket lifecycle to Jira Data Center: setup, verbs, SDLC hygiene mapping (grab-issues-not-epics, epic-closes-when-children-done, maker≠verifier, blocking links, lane→component), and graceful fallback to `plan.json`-only. Wraps `scripts/jira/jira.mjs`, which ships only in attest (as does `docs/DESIGN_JIRA_ADAPTER.md`) |
+| `figma-adapter.md` | design-system-lead, frontend-design | Bring a real Figma design into the design pipeline: `pull` a file → normalized `figma-snapshot.json`, `derive-tokens` → `docs/design/tokens.json` (which stays authoritative), one-way Figma→code, graceful fallback to prose-authored tokens. Wraps `scripts/figma/figma.mjs`, which ships only in attest (as does `docs/DESIGN_FIGMA_ADAPTER.md`) |
+| `adr-template.md` | `CHALLENGER_PROTOCOL`, `validate-adrs.sh` | Blank Architecture Decision Record for a hard-to-reverse choice; copy to `docs/adrs/ADR-NNN-<slug>.md` |
+| `anti-slop-audit.md` | `code-reviewer` | Six LLM-code anti-patterns to hunt on every review: try/catch outside system boundaries, abstractions with one implementation, single-use helpers, "what" comments, scope creep, framework wrappers |
+| `antv-x6-v3.md` | `/api-ground` | AntV X6 v3 API facts that training data and npm get wrong, verified against an installed tree |
+| `click-path-audit.md` | `ui-verifier`, `frontend-design` | Static preflight for handlers that each work but cancel each other out in one click path |
+| `cloud-cost-checklist.md` | `cost-engineer` | Per-category cloud cost checks, how to measure on each major cloud, typical savings |
+| `data-classification-checklist.md` | `data-steward` | Classification levels and the obligations attached to each class of field |
+| `design-system-tradeoffs.md` | `frontend-design` | Choosing between three design-system architectures by team size, time budget and customization needs |
+| `language-review-checklists.md` | `code-reviewer`, `coding-agent`, `type-safety-checker`, `error-handling-auditor`, `concurrency-checker` | Rust, TypeScript, Python and Go checks, each with a machine-checkable form; read only the diff's languages |
+| `library-adoption-protocol.md` | `coding-agent`, `/pre-code`, `/api-ground` | Four questions to answer, from four authorities, before adopting or upgrading a third-party library |
+| `library-api-grounding.md` | `/api-ground` | Why generated code calls methods that do not exist, and how to detect each cause mechanically |
+| `llm-routing-principles.md` | read on demand (no agent cites it) | Failure modes and principles for routing workloads to local or hosted models |
+| `load-test-checklist.md` | `reliability-engineer` | Load-test types, tool selection, NFR-to-threshold recipe, resilience patterns, chaos starters |
+| `local-agentic-models.md` | `MODEL_ADAPTER`, `LOCAL_LLM_PRIMER` (shared protocols) | Local models that hold up for tool calling, and the runtime settings that make or break them |
+| `mermaid-safe-syntax.md` | `sdlc-lead`, `BOOK_PROTOCOL` | Rules that prevent the Mermaid parse errors LLM generation introduces; checked by `validate-mermaid.sh` |
+| `observability-checklist.md` | `analytics-architect` | Metric methodologies, metric design, taxonomy, dashboard patterns, alert rules |
+| `phase-completion-checklist.md` | read on demand (no agent cites it) | What "done" means per SDLC phase: the validator gate plus the human-judgment checks |
+| `real-browser-bridge.md` | `design-iterator`, `/design-iterate`, `BROWSER_TESTING` | How to audit logged-in, real-world UIs that an isolated dev-server browser cannot reach |
+| `sre-cloud-patterns.md` | read on demand (no agent cites it) | Per-cloud service equivalents (AWS, GCP, Azure) for the operational concerns `sre-engineer` designs |
+| `tracker-data-model-template.md` | `sdlc-init-phases-3-4` | Blank Tracker Data Model to fill in before generating a backlog into an external tracker |
+| `validator-performance.md` | read on demand (no agent cites it) | Runtime cost and rerun safety of each validator in `scripts/validators/` |
+| `visual-design-loop.md` | `design-iterator`, `/design-iterate`, `sdlc-init-phase-4` | The render, screenshot, critique, fix, re-verify loop behind `/design-iterate` |
+| `wcag-audit-checklist.md` | `a11y-compliance`, `/a11y` | WCAG 2.2 manual audit, run after the automated axe-core/pa11y/Lighthouse pass |
 
 ---
 
@@ -583,7 +703,7 @@ There is no separate `commands/` directory in this repo — `/sdlc` subcommands 
 
 ## Hooks
 
-Nine hook scripts in `hooks/`, copied (not symlinked) into `~/.claude/hooks/` by `install.sh` and wired up through hook entries in `~/.claude/settings.json`. PreToolUse hooks can block a tool call (exit 2); PostToolUse, UserPromptSubmit, and Stop hooks feed their output back to Claude as context.
+Twelve hook scripts in `hooks/`, copied (not symlinked) into `~/.claude/hooks/` by `install.sh` and wired up through hook entries in `~/.claude/settings.json`. PreToolUse hooks can block a tool call (exit 2); PostToolUse, UserPromptSubmit, and Stop hooks feed their output back to Claude as context.
 
 | Hook | Type | What it does |
 |------|------|--------------|

@@ -4,7 +4,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [3.12.0] — 2026-09-30
 
-Regenerated from attest v3.12.0 (Group K — see the attest changelog for the full story).
+Regenerated from attest v3.12.0 (Group K — see the attest changelog for the full story). Entries for 3.6.0–3.11.1 and the summary table for 1.26.4–3.3.1 were reconstructed afterwards and are marked as such.
 
 ### Added (hooks — per-target, hand-owned here)
 - `hooks/config-protection.sh` (PreToolUse): blocks edits to an existing lint/type/test config; case-insensitive, symlink-aware, vendored/fixture trees exempt; `EXPERTS_ALLOW_CONFIG_EDIT=1` bypasses.
@@ -15,6 +15,70 @@ Regenerated from attest v3.12.0 (Group K — see the attest changelog for the fu
 
 ### Generated from attest
 `references/language-review-checklists.md`, `references/click-path-audit.md`, agent additions (error-handling-auditor, type-safety-checker, MCP06 security checklist, onboard invariants, `test-engineer --coverage --pr`), `scripts/lib/{hook-guards,trace-order,edit-task-*,compliance-stats}.mjs`.
+
+## [3.11.1] — 2026-09-23
+
+_Reconstructed 2026-10-08 from the v3.11.1 GitHub release notes and PR #5; the changelog was not kept at release time._
+
+### Fixed (hand-owned files)
+- `install.sh` printed `attest-claude v1.4.0` on every release. The version now comes from the checkout's newest release tag; `./install.sh --version` prints it without installing.
+- `uninstall.sh` left 196 links in `~/.claude` (agent sub-clusters, `agents/shared/`, `exemplars/`, `scripts/`, `validators/`, `.semgrep`) and the compact-overlay copies. It now removes every symlink that points back into this checkout, the compact copies, and folders the install left empty.
+
+## [3.11.0] — 2026-09-23
+
+_Reconstructed 2026-10-08 from the v3.11.0 GitHub release notes and PRs #3 and #4._
+
+Regenerated from attest v3.11.0; see the attest changelog, including the **conductor exit-code change** (dirty tree, missing `plan.json` or missing prerequisite now exit 7, not 1).
+
+### Generated from attest
+- Default `/sdlc onboard` and `/security --deep` can pass their own gates; `/security` implements `--deep`, `--owasp`, `--threat-model` and `--deps`.
+- Mode 3 and Mode 4 discovery interviews restored; parallel HANDOFFs to one agent no longer overwrite each other; Gate A/B fact-checks target files that exist; canonical use-cases path `docs/testing/USE_CASES.md`.
+
+### Changed (hand-owned files)
+- `scripts/detect-sdlc-state.sh` accepts `docs/testing/USE_CASES.md` (legacy path still works), and its partial-status output no longer errors (`printf '- %s'` read the `-` as an option).
+- USERGUIDE, SDLC_GUIDE and FEATURES: onboarding and security sections corrected.
+
+## [3.10.1] — 2026-09-20
+
+_Reconstructed 2026-10-08 from the v3.10.1 GitHub release notes._
+
+Regenerated from attest v3.10.1 (`validate-no-ascii-art.sh` empty-target crash and false positives). No hand edits.
+
+## [3.10.0] — 2026-09-08
+
+_Reconstructed 2026-10-08 from the v3.10.0 GitHub release notes._
+
+Regenerated from attest v3.10.0 (conductor hardening); 9 generated files, two new.
+
+- `runtime-verdict.mjs`: the last line-anchored verdict wins, a missing verdict blocks, a line naming both outcomes fails closed (a model restating its instructions had self-approved).
+- `validate-scope.sh` + new `_scope-match.sh`: `**/*`, `*/**`, `*/*`, `?*/**` and `[a-z]*/**` no longer authorise the whole repo; renames are checked on both sides.
+- `tickets-lifecycle.mjs`: `close()` verify gets a timeout and a large enough buffer.
+- `review-triggers.mjs`: deletions now recruit reviewers.
+- `attempt-outcome.mjs`, new `session-containment.mjs`: findings cross attempt boundaries as fenced untrusted data; POSIX process-group timeout containment.
+
+## [3.9.0] — 2026-09-01
+
+_Reconstructed 2026-10-08 from the v3.9.0 GitHub release notes and the regeneration commit._
+
+Regenerated from attest v3.9.0: validator updates, including `validate-dead-code.sh` tool detection that honours globally installed binaries.
+
+## [3.8.1] — 2026-09-01
+
+_Reconstructed 2026-10-08 from the regeneration commit._
+
+Regenerated from attest v3.8.1: `code-reviewer` and `BOUNDED_TASK_CONTRACT.md` still write the review document, with a real `VERDICT` line, when a reference is unreadable under the session's permissions.
+
+## [3.8.0] — 2026-09-01
+
+_Reconstructed 2026-10-08 from the v3.8.0 GitHub release notes._
+
+Regenerated from attest v3.8.0: the glob-aware, containment-preserving `validate-scope.sh` and the JIRA board-driver libraries are in the generated set.
+
+## [3.6.0] — 2026-08-31
+
+_Reconstructed 2026-10-08 from the v3.6.0 GitHub release notes._
+
+Regenerated from attest v3.6.0 (Group P A-wave and `agents/shared/PRODUCT_SHAPE_PROTOCOL.md`: the canonical role table and two-stack rule, the feature map, and feature-grouped landing). attest v3.7.0 (`/autopilot`) changed no generated files, so there is no v3.7.0 here.
 
 ## [3.5.0] — 2026-08-11
 
@@ -30,6 +94,93 @@ Regenerated from attest v3.12.0 (Group K — see the attest changelog for the fu
 - `references/visual-design-loop.md` (protocol; tool table verified against @playwright/mcp 0.0.79 — snapshot-ref API) and `references/real-browser-bridge.md` (persistent profile / `--storage-state` / official `--extension` mode / `--cdp-endpoint` / claude-in-chrome tiers, plus the T5 build-our-own blueprint).
 - Design-chain wiring regenerated: sdlc-lead roster/table carry `design-iterator`; Phase 3 UX HANDOFF requests ux-engineer's `--auto` chain when `flows.md`/`tokens.json` are missing; Phase 4 Round 3b visual conformance after RUNTIME PASS.
 - `scripts/lib/img-gate.mjs` + `scripts/lib/annotate.mjs` now ship in this target (guide-scribe's reference was previously dangling here). They require `sharp` + `pixelmatch` available in the consuming project (`npm i -D sharp pixelmatch`).
+
+## [1.26.4 – 3.3.1] — 2026-07-01 to 2026-08-05
+
+_Reconstructed 2026-10-08. The changelog was not kept for these releases. Each row is the tag's own subject line and date, lightly normalised (attest was named `bpm-opencode-experts` before v3.0.0, so older tags say "regenerated from bpm-opencode-experts"). Each release here is the Claude build of the attest release with the same number; see the [attest changelog](https://github.com/bpmforge/attest/blob/main/CHANGELOG.md) for what changed. Versions without a row were not released for this repo._
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 3.3.1 | 2026-08-05 | aligned with attest v3.3.1 (fresh-machine bootstrap) |
+| 3.3.0 | 2026-08-05 | aligned with attest v3.3.0 (installer preflight + MCP health) |
+| 3.2.1 | 2026-08-05 | regenerated from attest v3.2.1 (P0 window-bleed fix) |
+| 3.2.0 | 2026-08-05 | regenerated from attest v3.2.0 (systemic Wiggum loop + challenger) |
+| 3.1.35 | 2026-08-05 | aligned with attest v3.1.35 (sdlc-lead persistence) |
+| 3.1.34 | 2026-08-05 | aligned with attest v3.1.34 (sdlc-hygiene scope fix) |
+| 3.1.33 | 2026-08-05 | regenerated from attest v3.1.33 (sdlc-hygiene.sh) |
+| 3.1.32 | 2026-08-04 | regenerated from attest v3.1.32 (docs/work hygiene policy) |
+| 3.1.31 | 2026-08-04 | regenerated from attest v3.1.31 (tracker gate fix) |
+| 3.1.30 | 2026-08-04 | regenerated from attest v3.1.30 (Phase 2 iteration counter) |
+| 3.1.29 | 2026-08-04 | regenerated from attest v3.1.29 (manifest template matches its gate) |
+| 3.1.28 | 2026-08-04 | regenerated from attest v3.1.28 (validator parsing fixes) |
+| 3.1.27 | 2026-08-04 | ./install.sh --update (mirrors attest v3.1.27) |
+| 3.1.26 | 2026-08-04 | README now explains how to install a specific release (mirrors attest v3.1.26) |
+| 3.1.25 | 2026-08-04 | regenerated from attest v3.1.25 (publish gate + CI reachability fix) |
+| 3.0.9 | 2026-07-30 | regenerated from attest v3.0.9 |
+| 3.0.8 | 2026-07-30 | regenerated from attest v3.0.8 |
+| 3.0.7 | 2026-07-30 | regenerated from attest v3.0.7 |
+| 3.0.6 | 2026-07-30 | regenerated from attest v3.0.6 |
+| 3.0.5 | 2026-07-30 | regenerated from attest v3.0.5 |
+| 3.0.4 | 2026-07-30 | regenerated from attest v3.0.4 |
+| 3.0.3 | 2026-07-30 | regenerated from attest v3.0.3 |
+| 3.0.2 | 2026-07-30 | regenerated from attest v3.0.2 |
+| 3.0.1 | 2026-07-30 | regenerated from attest v3.0.1 |
+| 3.0.0 | 2026-07-30 | regenerated from attest v3.0.0 |
+| 2.48.0 | 2026-07-29 | regenerated from attest v2.48.0 |
+| 2.47.0 | 2026-07-29 | regenerated from attest v2.47.0 |
+| 2.46.0 | 2026-07-29 | regenerated from attest v2.46.0 |
+| 2.45.0 | 2026-07-29 | regenerated from attest v2.45.0 |
+| 2.44.0 | 2026-07-29 | regenerated from attest v2.44.0 (four-verdict table) |
+| 2.42.0 | 2026-07-27 | regenerated: delegation integrity toolchain |
+| 2.37.0 | 2026-07-27 | regenerated: multi-ecosystem version currency |
+| 2.36.0 | 2026-07-27 | regenerated: library adoption protocol + registry verification |
+| 2.35.0 | 2026-07-27 | regenerated: --family check + AntV X6 v3 reference |
+| 2.34.1 | 2026-07-27 | regenerated: api-surface built-in-shadow fix |
+| 2.34.0 | 2026-07-27 | regenerated from attest v2.34.0: /api-ground skill + api-surface.mjs, gen-status-report.mjs + scripts/lib (fixes the steward skill's broken instruction) |
+| 2.33.0 | 2026-07-27 | Apache-2.0 licensing (generated from attest v2.33.0) |
+| 2.32.0 | 2026-07-24 | regenerate from attest (noop guard + task ledger) |
+| 2.31.0 | 2026-07-24 | regenerate from attest (done-gate + auto-baseline + version stamp) |
+| 2.30.0 | 2026-07-24 | regenerate from attest (verify harness + terminal-state whitelist) |
+| 2.29.0 | 2026-07-24 | regenerate from attest (verify-evidence discipline) |
+| 2.28.0 | 2026-07-23 | regenerate for v2.28.0 (grep-mcp removal + mid-task ask rules) |
+| 2.27.1 | 2026-07-23 | generated from attest v2.27.1 (post-compaction continuation rules) |
+| 2.27.0 | 2026-07-23 | generated from attest v2.27.0 (verify-loop convergence rules) |
+| 2.26.0 | 2026-07-23 | generated from attest v2.26.0 |
+| 2.25.0 | 2026-07-23 | generated from attest v2.25.0 (autocompaction survival: Rule 11) |
+| 2.23.0 | 2026-07-23 | HANDOFF intake (generated from attest v2.23.0) |
+| 2.22.0 | 2026-07-16 | generated: Opengrep-first SAST migration |
+| 2.21.0 | 2026-07-15 | regenerated from attest v2.21.0 |
+| 2.20.0 | 2026-07-15 | regenerated from attest v2.20.0 |
+| 2.19.0 | 2026-07-15 | regenerated from attest v2.19.0 |
+| 2.18.0 | 2026-07-15 | regenerated from attest v2.18.0 |
+| 2.17.0 | 2026-07-15 | regenerated from attest v2.17.0 |
+| 2.16.0 | 2026-07-15 | regenerated from attest v2.16.0 |
+| 2.15.0 | 2026-07-15 | regenerated from attest v2.15.0 |
+| 2.14.0 | 2026-07-15 | regenerated from attest v2.14.0 |
+| 2.13.0 | 2026-07-15 | regenerated from attest v2.13.0 |
+| 2.12.0 | 2026-07-14 | regenerated from attest v2.12.0 |
+| 2.11.0 | 2026-07-14 | regenerated from attest v2.11.0 |
+| 2.10.0 | 2026-07-14 | regenerated from attest v2.10.0 |
+| 2.9.0 | 2026-07-14 | regenerated from attest v2.9.0 |
+| 2.8.0 | 2026-07-14 | regenerated from attest v2.8.0 |
+| 2.7.0 | 2026-07-14 | regenerated from attest v2.7.0 |
+| 2.6.0 | 2026-07-14 | regenerated from attest v2.6.0 (Jira adapter reference) |
+| 2.5.0 | 2026-07-14 | regenerated from attest v2.5.0 (expert wiring audit) |
+| 2.4.0 | 2026-07-14 | generated from attest v2.4.0 |
+| 2.3.0 | 2026-07-14 | generated from attest v2.3.0 |
+| 2.2.2 | 2026-07-14 | generated from attest v2.2.2 |
+| 2.2.1 | 2026-07-14 | generated from attest v2.2.1 |
+| 2.2.0 | 2026-07-14 | generated from attest v2.2.0 (pullmd removed) |
+| 2.1.0 | 2026-07-13 | generated from attest v2.1.0 |
+| 2.0.0 | 2026-07-12 | regenerated from attest v2.0.0 + 5 skills ported |
+| 1.32.0 | 2026-07-06 | regenerate from attest v1.32.0 — non-circular UX gate + validate-spec-traceability |
+| 1.30.0 | 2026-07-03 | Wave O2 loop upgrades (regenerated) |
+| 1.29.0 | 2026-07-02 | Wave O1 autonomy levels (regenerated) |
+| 1.28.0 | 2026-07-02 | Wave O0 accidental-pause fixes (regenerated) |
+| 1.27.1 | 2026-07-02 | code-review Tech-Stack Compliance dimension (regenerated) |
+| 1.27.0 | 2026-07-01 | module-contract tickets, /reflow, checkpoint + /sdlc resume (regenerated) |
+| 1.26.5 | 2026-07-01 | handoff-discipline validator catches gate-less dispatchers (regenerated) |
+| 1.26.4 | 2026-07-01 | HANDOFF completeness + executor gates (regenerated) |
 
 ## [1.26.3] — 2026-07-01
 

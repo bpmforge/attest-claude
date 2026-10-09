@@ -41,6 +41,10 @@ docs/threat/
 docs/test/
 docs/db/
 
+# Validator telemetry (per-machine, append-only) -- validators write this under
+# any project root they run against, including this checkout.
+**/docs/work/telemetry.jsonl
+
 # Runtime logs
 *.log
 logs/
