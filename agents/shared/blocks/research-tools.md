@@ -13,3 +13,5 @@ Three web-research tools are registered project-wide via the `playwright-search`
 - `web_fetch(url, max_chars=8000, relevance_query?)` — clean article text via Mozilla Readability
 
 Read `~/.claude/agents/shared/RESEARCH_TOOLS.md` for the full surface, when-to-use guidance, and tips. Free, polite (rate-limited + robots.txt), 24h cached.
+
+**Paths in these instructions:** `references/<x>.md` means `~/.claude/agents/<x>.md`, `agents/shared/<x>.md` means `~/.claude/agents/shared/<x>.md`, and attest scripts live in `~/.claude/scripts/`. Paths like `docs/…` or `src/…` are relative to the project you are working in.
