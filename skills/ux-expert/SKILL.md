@@ -16,6 +16,9 @@ arguments:
   - name: --audit
     description: WCAG 2.2 Level AA accessibility audit only
     required: false
+  - name: --research
+    description: Design research — cited references from shipped products, patterns extracted, directions checked against the stack → docs/design/REFERENCES.md
+    required: false
   - name: --flows
     description: User workflow diagrams only (no code, no style guide)
     required: false
@@ -28,6 +31,7 @@ Senior UX engineer that combines Nielsen Norman methodology, Anthropic's fronten
 **Three modes:**
 
 - **`/ux --design`** (greenfield) — pick a bold aesthetic direction, write design principles + style guide + UX spec. Invoked by `sdlc-lead` during Phase 3 for UI-bearing projects.
+- **`/ux --research "<screen or job>"`** — study how shipped products and runnable open-source apps solve the same job (references/design-research-protocol.md): 5–8 cited, captured, annotated references → patterns → 2–3 stack-checked directions in `docs/design/REFERENCES.md`. Also the first step of `--design` for major screens.
 - **`/ux --review`** (PR / existing UI) — 7-phase live review: Interaction → Responsive → Visual → A11y → Robustness → Code Health → Content. Uses Playwright MCP if available, falls back to script or static. Blocker/High/Medium/Nit triage.
 - **`/ux --audit`** (WCAG) — focused accessibility audit against WCAG 2.2 Level AA.
 
