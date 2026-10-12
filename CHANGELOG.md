@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.13.0] — 2026-10-12
+
+Regenerated from attest v3.13.0 — UI/UX design experts (see the attest changelog for detail).
+
+### Added (skills — hand-owned here)
+- `/interaction` + `interaction-engineer` — spec / implement / audit drag-and-drop, sortable, resizable panels, layout editors, node canvases, command palette, undo, layout JSON persistence.
+- `/agent-ui` + `agent-ui-engineer` — design / implement / audit approvals, tool-call/trace views, streaming states, generative UI from a typed catalog (A2UI / OpenUI / MCP Apps considered).
+- `/graphics` + `graphics-engineer` — 3D (three.js / R3F), WebGL/WebGPU, PixiJS/OGL canvas with per-tier budgets, static fallback first, disposal, canvas a11y.
+- `/ux --research` — design research from cited shipped products and runnable OSS apps.
+
+### Generated from attest
+- `scripts/stack-coherence.mjs` + `references/stack-coherence.md` — one framework, one kit, one library per purpose; required in every UI agent's pre-completion gate.
+- References: `ui-ecosystem-map`, `interaction-patterns`, `agent-ui-patterns`, `graphics-patterns`, `component-sourcing`, `design-research-protocol`, `ai-design-tells`, `design-md-interop`, `design-feedback-schema`, `agent-app-references`.
+- ux-engineer two-layout comparison + FEEDBACK JSON export; design-system-lead DESIGN.md interop; design-iterator deterministic AI-design-tell pass.
+
 ## [3.12.0] — 2026-09-30
 
 Regenerated from attest v3.12.0 (Group K — see the attest changelog for the full story). Entries for 3.6.0–3.11.1 and the summary table for 1.26.4–3.3.1 were reconstructed afterwards and are marked as such.
