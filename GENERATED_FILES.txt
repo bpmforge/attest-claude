@@ -3,6 +3,7 @@
 # Per-target files (skills/, hooks/, docs/, install.sh, doctor.sh, README, CHANGELOG) are owned by this repo.
 
 agents/a11y-compliance.md
+agents/agent-ui-engineer.md
 agents/analytics-architect.md
 agents/api-designer.md
 agents/app-cartographer.md
@@ -42,8 +43,10 @@ agents/game/narrative-designer.md
 agents/game/playtest-evaluator.md
 agents/gauntlet-lead.md
 agents/git-expert.md
+agents/graphics-engineer.md
 agents/guide-scribe.md
 agents/guide.md
+agents/interaction-engineer.md
 agents/llm-integration-engineer.md
 agents/manual-writer.md
 agents/migration-planner.md
@@ -156,6 +159,7 @@ agents/ui-verifier.md
 agents/ux-engineer.md
 agents/ux-researcher.md
 dist/compact-agents/a11y-compliance.md
+dist/compact-agents/agent-ui-engineer.md
 dist/compact-agents/analytics-architect.md
 dist/compact-agents/api-designer.md
 dist/compact-agents/app-cartographer.md
@@ -176,8 +180,10 @@ dist/compact-agents/end-user-simulator.md
 dist/compact-agents/frontend-design.md
 dist/compact-agents/gauntlet-lead.md
 dist/compact-agents/git-expert.md
+dist/compact-agents/graphics-engineer.md
 dist/compact-agents/guide-scribe.md
 dist/compact-agents/guide.md
+dist/compact-agents/interaction-engineer.md
 dist/compact-agents/llm-integration-engineer.md
 dist/compact-agents/manual-writer.md
 dist/compact-agents/migration-planner.md
@@ -210,18 +216,27 @@ exemplars/gap-report.md
 exemplars/security-finding.md
 exemplars/sequence-diagram.md
 references/adr-template.md
+references/agent-app-references.md
+references/agent-ui-patterns.md
+references/ai-design-tells.md
 references/anti-slop-audit.md
 references/antv-x6-v3.md
 references/click-path-audit.md
 references/cloud-cost-checklist.md
 references/code-health-checklist.md
+references/component-sourcing.md
 references/context7-mcp.md
 references/data-classification-checklist.md
+references/design-feedback-schema.md
+references/design-md-interop.md
+references/design-research-protocol.md
 references/design-review-checklist.md
 references/design-system-tradeoffs.md
 references/engineering-artifacts.md
 references/figma-adapter.md
 references/git-workflow-checklist.md
+references/graphics-patterns.md
+references/interaction-patterns.md
 references/jira-adapter.md
 references/language-review-checklists.md
 references/library-adoption-protocol.md
@@ -242,7 +257,9 @@ references/semgrep-community-rules.md
 references/semgrep-guide.md
 references/severity-matrix.md
 references/sre-cloud-patterns.md
+references/stack-coherence.md
 references/tracker-data-model-template.md
+references/ui-ecosystem-map.md
 references/validator-performance.md
 references/visual-design-loop.md
 references/wcag-audit-checklist.md
@@ -292,6 +309,7 @@ scripts/loop-learn.mjs
 scripts/mermaid-fix.mjs
 scripts/review-packet.mjs
 scripts/run-plan.mjs
+scripts/stack-coherence.mjs
 scripts/telemetry-report.mjs
 scripts/validators/_lib.sh
 scripts/validators/_lib_sdlc_config.sh
