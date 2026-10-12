@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.13.1] — 2026-10-12
+
+Regenerated from attest v3.13.1 — smoke-test fixes for the UI experts (see the attest changelog).
+
+### Changed (generated from attest)
+- No hard tool-call caps: agents stop on quality (criterion met / confidence ≥ 8, three calls with nothing new, repeat URL/file). Failure and schema strike rules unchanged.
+- Reference paths now resolve on the Claude install: `references/<x>.md` → `~/.claude/agents/<x>.md` (where they are installed).
+- interaction/graphics/agent-ui/design-research references: numbered gates, new gates, reconciled severity, working measurement recipes, per-mode gate scope.
+- `agents/shared/BROWSER_TESTING.md`: which-browser-tool table (incl. Claude built-in browser and claude-in-chrome) and an ESM Node-Playwright recipe.
+
 ## [3.13.0] — 2026-10-12
 
 Regenerated from attest v3.13.0 — UI/UX design experts (see the attest changelog for detail).
