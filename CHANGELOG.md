@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added — interaction + agent UI experts (merge AFTER attest merges and `scripts/regen-claude-target.sh` runs)
+- `/interaction` skill (hand-authored twin) + `interaction-engineer` agent — spec / implement / audit drag-and-drop, sortable, resizable panels, layout editors, node canvases, command palette, undo, layout JSON persistence.
+- `/agent-ui` skill (hand-authored twin) + `agent-ui-engineer` agent — design / implement / audit approvals, tool-call/trace views, streaming states, generative UI from a typed catalog.
+- References (generated): `ui-ecosystem-map.md`, `interaction-patterns.md`, `agent-ui-patterns.md`, `component-sourcing.md`.
+
 ## [3.5.0] — 2026-08-11
 
 ### Added — gauntlet loop (regenerated from canonical v3.5.0)
