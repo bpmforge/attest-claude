@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.13.3] — 2026-10-12
+
+Regenerated from attest v3.13.3.
+
+### Fixed (generated from attest)
+- validate-sequence-coverage reported every P0 sequence diagram as missing on large ARCHITECTURE.md files (`grep -q` under `pipefail` → SIGPIPE 141); same pattern fixed in 6 more validators.
+- Generated files now keep the source file mode (no more 644/755 flip on regen).
+
+### Added (generated from attest)
+- JSON-Schema contract mode for api-coverage and the phase-3 gate (non-HTTP systems: MCP servers, native messaging, CLIs).
+
 ## [3.13.2] — 2026-10-12
 
 Regenerated from attest v3.13.2.
