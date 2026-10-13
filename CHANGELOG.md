@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.13.2] — 2026-10-12
+
+Regenerated from attest v3.13.2.
+
+### Changed (generated from attest)
+- `design-feedback-schema.md` v1.1 — optional `status`, `dismissReason`, `statusChangedAt`, `gate:manual-review` (additive; `schemaVersion` stays "1").
+
 ## [3.13.1] — 2026-10-12
 
 Regenerated from attest v3.13.1 — smoke-test fixes for the UI experts (see the attest changelog).
