@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.14.1] — 2026-10-21
+
+Regenerated from attest v3.14.1 (token budget by design — see attest's
+`docs/work/TOKEN_OPTIMIZATION_PLAN.md` and `RELEASE_NOTES_v3.14.0.md` / `v3.14.1.md`).
+
+### Changed (generated from attest)
+- Review tiers: the conductor's per-ticket gate is one lean diff review plus a deterministic scan; the full security / code-health / perf audit runs once per branch (`scripts/conductor/integration-review.mjs`) and `validate-release-readiness.sh` requires its summary (condition 13).
+- Round 3 runtime gate is script-run (`--runtime-mode script`); a model is spent only on a FAIL diagnosis.
+- `scripts/scan/collect.sh` runs semgrep/secrets/deps/dead-code/duplication/complexity once; security-auditor and code-reviewer triage its JSON instead of dispatching tool-wrapping specialists.
+- Rule cards (`agents/shared/cards/`) replace long-form protocol reads inside bounded-task sessions.
+- HANDOFF emitter (`scripts/handoff-emit.sh`): lints the written HANDOFF and prints the exact five-line reply (paste line fenced); lead/mode prompts updated so the handoff reply is never a typed pointer or an echoed body.
+- Turn budget (`EXPERTS_MAX_TURNS`, default 120 via the conductor) with same-worktree continuation; tool results bounded at 24k chars; finish=length warning in the TUI.
+
 ## [3.13.3] — 2026-10-12
 
 Regenerated from attest v3.13.3.

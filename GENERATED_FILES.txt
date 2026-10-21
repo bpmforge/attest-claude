@@ -141,6 +141,9 @@ agents/shared/blocks/loop-prevention.compact.md
 agents/shared/blocks/loop-prevention.md
 agents/shared/blocks/research-tools.compact.md
 agents/shared/blocks/research-tools.md
+agents/shared/cards/ANTI_SLOP_CARD.md
+agents/shared/cards/BOUNDED_TASK_CARD.md
+agents/shared/cards/LOOP_PREVENTION_CARD.md
 agents/shared/includes/act-dont-overplan.md
 agents/shared/includes/anti-overengineering.md
 agents/shared/includes/autonomy-end-turn-check.md
