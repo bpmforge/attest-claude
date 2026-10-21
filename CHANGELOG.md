@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.14.2] — 2026-10-21
+
+Regenerated from attest v3.14.2.
+
+### Added (generated from attest)
+- Dropped provider streams are named where they happen (plugin warning), summarised per model in `telemetry-report.mjs` ("Stream health", UNRELIABLE above 10%), and flagged by `doctor.sh` from the project's telemetry — the "same reply repeated in the TUI" symptom is a provider retry, not an agent loop.
+
 ## [3.14.1] — 2026-10-21
 
 Regenerated from attest v3.14.1 (token budget by design — see attest's
