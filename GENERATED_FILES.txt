@@ -135,6 +135,8 @@ agents/shared/blocks/code-search.compact.md
 agents/shared/blocks/code-search.md
 agents/shared/blocks/context-budget.compact.md
 agents/shared/blocks/context-budget.md
+agents/shared/blocks/delta-review.compact.md
+agents/shared/blocks/delta-review.md
 agents/shared/blocks/handoff-intake.compact.md
 agents/shared/blocks/handoff-intake.md
 agents/shared/blocks/loop-prevention.compact.md
@@ -289,6 +291,7 @@ scripts/lib/jira-tickets.test.mjs
 scripts/lib/lifecycle-outbox.mjs
 scripts/lib/model-limits-sync.mjs
 scripts/lib/model-tiers.mjs
+scripts/lib/opencode-cli.mjs
 scripts/lib/reconciliation-matrix.mjs
 scripts/lib/reflow-audit.mjs
 scripts/lib/review-triggers.mjs
@@ -312,6 +315,7 @@ scripts/loop-learn.mjs
 scripts/mermaid-fix.mjs
 scripts/review-packet.mjs
 scripts/run-plan.mjs
+scripts/run-until-done.sh
 scripts/stack-coherence.mjs
 scripts/telemetry-report.mjs
 scripts/validators/_lib.sh

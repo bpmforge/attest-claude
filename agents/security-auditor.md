@@ -94,6 +94,23 @@ Deliverables > 300 lines → book format. Read `agents/shared/BOOK_PROTOCOL.md`.
 
 ---
 
+## RBAC Cardinality Rule (MANDATORY)
+
+If the schema stores **N roles per principal** (a many-to-many user↔role relationship), permission enforcement MUST compute the **union of grants** across all of a user's roles. It must NEVER resolve effective permissions by "whichever role wins" (highest-priority-role-only logic) — that silently **under-grants** a permission legitimately held via a lower-priority role, or in some buggy implementations **over-grants**, depending on which role "wins." Document the enforcement rule explicitly in `SECURITY_CONTROLS.md` (e.g. "effective permissions = union of grants across all of the principal's roles") whenever a many-to-many role model is in play.
+
+## Core digest (procedure lives below the marker)
+
+Interactive/full audit (no `SDLC-TASK` prefix): Phase 0 announce plan → Phase 1 deterministic scan in one bash call + one `security/semgrep-runner` triage session → Phase 2 and 3 specialist waves → Phase 4 `attack-chainer` last → Phase 5 synthesis → Challenger Gate → completion output. The full procedure is § Execution in the full file — read it before dispatching any wave. Bounded task: dispatch only the specialist named in YOUR TASK and return its output.
+
+## Mandatory gates — full text below the marker
+
+These apply when their trigger fires; read the full section (pointer at the end) before acting on one.
+
+- **Bootstrap & Empty-State Checklist (MANDATORY when producing SECURITY_CONTROLS.md)** — Field lesson (M29): an external team stress-tested a pre-amplifier install and found that generated designs routinely pass every security gate while never answering how the system bootstraps from an e
+- **Threat Catalog: Bootstrap & Authority (MANDATORY archetypes)** — Every threat model MUST explicitly assess these three named threats (present with a mitigation, or explicitly ruled N/A with a one-line reason) in addition to the standard per-component STRIDE pass. A
+
+<!-- attest:full -->
+
 ## Execution
 
 ### Phase 0 — Announce Plan
@@ -109,6 +126,8 @@ Starting security audit (--deep). Specialists:
   Wave 5: final-report synthesis + Challenger Gate
   Then: run-coverage-loop.sh security-deep (max 3 rounds)
 ```
+
+After Step 1 returns, add one line to the announcement: `Scan scope: full` or `Scan scope: incremental since <sha7> (<n> changed files)`, taken from the totals line only (`scope=tree` is printed as full).
 
 Quick mode announces Wave 1 (collect.sh + triage) + owasp-web-checker + synthesis; a focused mode announces its one specialist.
 
@@ -138,7 +157,9 @@ Read `docs/ARCHITECTURE.md` (if present), `README.md`, and entry points to under
 bash ~/.claude/scripts/scan/collect.sh --root . --only semgrep,secrets,deps
 ```
 
-It prints the JSON path (`docs/work/scan/scan_<date>.json`) and a one-line totals summary on stderr. Tools that are not installed are recorded as `"status":"skipped"` with the install hint — note them in the final report's "Coverage" section, do not try to install them. Read **only the totals line**, never the JSON, into this conversation (`TUI_SESSION_HYGIENE.md` Rule 3 — the raw scan is the largest tool output in the system).
+This is auto mode: each scanner diffs against the last full run recorded in `docs/work/scan/ledger.json` and falls back to a full scan on its own when it must. With `--full`, append `--full` (forces a whole-tree scan).
+
+It prints the JSON path (`docs/work/scan/scan_<date>.json`) and a one-line totals summary on stderr. Tools that are not installed are recorded as `"status":"skipped"` with the install hint — note them in the final report's "Coverage" section, do not try to install them. Read **only the totals line**, never the JSON, into this conversation (`TUI_SESSION_HYGIENE.md` Rule 3 — the raw scan is the largest tool output in the system). The totals line starts `scope=tree|range|incremental …` (incremental adds `base=<sha7> changed=<n>`); keep that scope for the announce block and the final report's `Scope:` line. For `<m>` findings carried forward, read the single scalar `jq -r '.meta.carried_forward // 0' <json path>` — never the file.
 
 **Step 2 — one triage session.** Per the Executor rule above, dispatch `security/semgrep-runner` once (A or B, never inline). Its task is triage, not scanning:
 
@@ -162,6 +183,7 @@ After Wave 1 completes:
 ```
 HANDOFF to: security/owasp-web-checker
 Context: Read docs/work/scan/scan_<date>.json and SEMGREP_FINDINGS to avoid duplication — do not re-run the scanners.
+Prior report: <path of the newest docs/security/OWASP_WEB_FINDINGS_*.md, if one exists — omit the line otherwise>
 Produce: docs/security/OWASP_WEB_FINDINGS_<date>.md, OWASP_TRACKER.md
 Complete: "owasp-web done"
 ```
@@ -179,6 +201,7 @@ Complete: "owasp-llm done"
 ```
 HANDOFF to: security/threat-modeler
 Context: Read SEMGREP_FINDINGS and OWASP_WEB_FINDINGS.
+Prior report: <path of the newest docs/security/THREAT_MODEL_FINDINGS_*.md, if one exists — omit the line otherwise>
 Produce: docs/security/THREAT_MODEL_FINDINGS_<date>.md, docs/THREAT_MODEL.md
 Complete: "threat-model done"
 ```
@@ -238,6 +261,7 @@ Specialists run: N
 Findings: CRITICAL: N  HIGH: N  MEDIUM: N  LOW: N
 Attack chains: N (N CRITICAL, N HIGH)
 Domains: Semgrep, OWASP Web, [LLM,] Threat Model, Secrets, [Cloud,] [IaC,] Dependencies
+Scope: full | incremental since <sha7> (<n> changed files, <m> findings carried forward)
 
 Deliverables:
   docs/security/SEMGREP_FINDINGS_<date>.md
@@ -271,6 +295,7 @@ specialists, each of whom stores its own slice.
 | `--deep` | **Deep** — below |
 | `--owasp` / `--threat-model` / `--deps` | **Focused** — below; combine with `--deep` to put that surface under the coverage loop |
 | `--fix` (with any of the above) | The chosen audit, then **Fix Mode** |
+| `--full` (with any of the above) | Force a whole-tree scan; otherwise the scan is incremental since the last full run recorded in `docs/work/scan/ledger.json` |
 
 ### Quick Mode (`--quick`, no flag)
 
@@ -337,10 +362,6 @@ Every threat model MUST explicitly assess these three named threats (present wit
 | bootstrap-authority | **Bootstrap-authority threat** | The system has no way to create the first privileged user without out-of-band intervention (manual SQL, a seed script that isn't safe to re-run, or an undocumented env var). |
 | self-referential-permission-gate | **Self-referential permission gate** | A permission check is gated on a role that only that same role (or a role reachable only through it) can grant — a circular authority requirement with no escape path. |
 | rbac-highest-role-wins | **RBAC highest-role-wins** | A many-to-many (N roles per principal) role schema whose enforcement logic picks "the highest-priority role" instead of computing the union of grants across all held roles — see the RBAC Cardinality Rule below. |
-
-## RBAC Cardinality Rule (MANDATORY)
-
-If the schema stores **N roles per principal** (a many-to-many user↔role relationship), permission enforcement MUST compute the **union of grants** across all of a user's roles. It must NEVER resolve effective permissions by "whichever role wins" (highest-priority-role-only logic) — that silently **under-grants** a permission legitimately held via a lower-priority role, or in some buggy implementations **over-grants**, depending on which role "wins." Document the enforcement rule explicitly in `SECURITY_CONTROLS.md` (e.g. "effective permissions = union of grants across all of the principal's roles") whenever a many-to-many role model is in play.
 
 ## Methodology reference (load on demand)
 

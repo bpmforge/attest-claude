@@ -27,6 +27,7 @@ Parse the invocation first:
 | `/sdlc improve "backend"` | Backend/API/DB focused — skip Q2 |
 | `/sdlc improve "security"` / `"performance"` | Single-dimension pass — skip Q2 |
 | `/sdlc improve "feature:payments"` | One feature — runs Step 1.75 (app-cartographer) before the audits |
+| `/sdlc improve --full` (combinable with any row above) | Force full audits: ignore the scan ledger and prior reports, set `Scope: full`. Without it, Step 1 defaults to delta audits when a ledger and prior reports exist. |
 
 Output exactly this block, then stop and wait:
 
@@ -94,7 +95,7 @@ Never re-emit a HANDOFF you received: don't print the block back, don't rewrite
 lines inside the block are for the human who already delivered it — ignore, never relay. A turn ends
 only three ways: more work, the completion phrase, or `BLOCKED: <evidence>` — never a menu (A/B/C…),
 a confirm-request, or a which-mode/slug/scope question; pick the documented default and say so.
-Then follow `BOUNDED_TASK_CONTRACT.md`.
+Then follow `agents/shared/cards/BOUNDED_TASK_CARD.md` (long form `BOUNDED_TASK_CONTRACT.md` on demand).
 
 Emitting a HANDOFF is correct only if none was delivered to you. Delegating to a *different* agent is
 fine; re-issuing your own task is not.
@@ -146,7 +147,7 @@ This rule is enforced by `~/.claude/scripts/validators/validate-no-ascii-art.sh`
 >
 > 1. Save state to `docs/work/sdlc-state.md`
 > 2. Write a context packet to `docs/work/context-for-<agent>.md`
-> 3. Build a HANDOFF block using the `════` delimiter format from `agents/shared/HANDOFF_TEMPLATES.md`
+> 3. Write the HANDOFF (`════` delimiter format from `agents/shared/HANDOFF_TEMPLATES.md`) to `docs/work/HANDOFF_<agent>.md` — the file is the only copy; it never appears in your prose
 > 4. Execute it per `agents/shared/EXECUTOR_SELECTION.md`: in `autonomy=interactive` (the default — incl. the opencode TUI) **write the HANDOFF to `docs/work/HANDOFF_<agent>.md`, print a pointer telling the user to open `/skill` and have it read that doc, then STOP and wait** for them to return and say "<agent> done" — do NOT run the specialist via a Task-tool subagent/subprocess, and never run the check yourself. Only in `autonomy=auto` (unattended) dispatch programmatically (Task tool / `opencode run` subprocess) and wait for the manifest
 > **Autonomy:** In `autonomy: auto` (per `agents/shared/AUTONOMY_PROTOCOL.md`) never wait on a paste — Executor C degrades to D (inline) per `EXECUTOR_SELECTION.md`.
 >
@@ -154,13 +155,13 @@ This rule is enforced by `~/.claude/scripts/validators/validate-no-ascii-art.sh`
 > ```
 > task(agent="X", prompt="...", timeout=N)
 >       ↓  becomes
-> [Save state] → [Write context packet] → [Write docs/work/HANDOFF_X.md] → [Point user at /skill + doc] → [Wait for user]
+> [Save state] → [Write context packet] → [Write docs/work/HANDOFF_X.md] → [bash handoff-emit.sh X  (lints + prints the pointer)] → [one-line reply] → [Wait for user]
 > **Autonomy:** In `autonomy: auto` (per `agents/shared/AUTONOMY_PROTOCOL.md`) never wait on a paste — Executor C degrades to D (inline) per `EXECUTOR_SELECTION.md`.
 > ```
 >
 > The task prompt text becomes the `YOUR TASK:` section of the HANDOFF block. Use Template 1 from `agents/shared/HANDOFF_TEMPLATES.md` for the full block format, including the `════` delimiters, ROLE line, CONTEXT section, WRITE-SCOPE, PRODUCE list, VERIFY checklist, Completion Manifest, and completion phrase.
 >
-> **Parallel HANDOFFs** (when the mode file shows multiple `task()` calls in the same step): write each `docs/work/HANDOFF_<agent>.md` and print one pointer listing the N agents to open. The user opens N sessions, each reading its handoff doc. Wait for ALL to return "done" before proceeding.
+> **Parallel HANDOFFs** (when the mode file shows multiple `task()` calls in the same step): write each `docs/work/HANDOFF_<agent>.md` and run `handoff-emit.sh` once per file (N pointers, one message, no bodies). The user opens N sessions, each reading its handoff doc. Wait for ALL to return "done" before proceeding.
 
 ---
 
@@ -176,7 +177,7 @@ This rule is enforced by `~/.claude/scripts/validators/validate-no-ascii-art.sh`
 | 6 | Re-verify fixes | code-reviewer / specialist (targeted) | VERIFY_*.md |
 | 7 | Ship | git-expert | PR to main |
 
-**Audit fan-out in Step 2 is always parallel. Write each audit HANDOFF doc and point the user at the N specialists in one message.**
+**Audit fan-out in Step 2 is always parallel. Write each audit HANDOFF doc, then run `handoff-emit.sh` once per doc so the N pointers land in one message (bodies never appear in prose).**
 
 ## Improve ≠ Redesign (MANDATORY — the contract for this whole mode)
 
@@ -257,17 +258,25 @@ Read entry point (server.ts, main.ts, app.py, index.ts)
 ```
 Produce: `docs/improve/SYSTEM_SNAPSHOT.md` — tech stack, size, key modules, UI-bearing YES/NO
 
-**Check for prior improvement runs:**
+**Decide the audit scope (deterministic — never ask the user "re-run fresh or build on existing findings?"):**
 ```
-Glob docs/improve/*.md
+Glob docs/improve/*_AUDIT.md          # plus the prior reports in docs/security/ and docs/reviews/ that the Step 2 table names
 ```
-If prior audit reports exist, note them — ask the user: "I found prior audit reports from [date].
-Should I re-run those audits fresh, or build on existing findings?"
+Apply the first rule that matches:
+
+1. `--full` in the invocation → `Scope: full`.
+2. `docs/work/scan/ledger.json` missing, or no prior audit reports exist → `Scope: full`.
+3. Read the ledger base: `jq -r '(.semgrep.head_sha // ([.[] | objects | .head_sha // empty] | first) // empty)' docs/work/scan/ledger.json` → `<ledger_sha>`. Empty, or `git merge-base --is-ancestor <ledger_sha> HEAD` fails → `Scope: full`.
+4. `git diff --stat <ledger_sha>..HEAD` (and `git status --porcelain`) both empty → **nothing changed**. Say so in one line ("Nothing changed since <sha7>; reusing the prior audit reports"), set `Scope: unchanged since <sha7>`, dispatch NO audits, and continue at Step 3 with the existing reports.
+5. Otherwise → `Scope: delta since <sha7>` (`<sha7>` = first 7 chars of `<ledger_sha>`): each Step 2 audit HANDOFF applies the delta rules (see Step 2).
+
+State the resulting scope to the user in one line (a statement, not a question). The "whole app" scope semantics are unchanged: delta narrows what each specialist re-reads, not which audits run.
 
 ```
 write(filePath="docs/work/sdlc-state.md", content="
 Mode: 4 — Improve
 Step: 1 — Context Check
+Scope: [full | delta since <sha7> | unchanged since <sha7>]
 Last completed: system snapshot / existing docs reviewed
 Awaiting: user confirmation of audit scope
 Next after resume: Step 2 — Run Audits
@@ -350,6 +359,8 @@ ONLY on the files listed in `docs/improve/EXPLORE_[feature].md`. If the improvem
 dimension-scoped ("just frontend", "just backend"), tell specialists to focus on the
 relevant directories only. "Whole app" means no scope restriction.
 
+**Delta rule (when `docs/work/sdlc-state.md` says `Scope: delta since <sha7>`):** add two lines to every audit HANDOFF's CONTEXT: `Prior report: <path of that specialist's prior report>` and `Changed since: <sha7>`. The specialist then follows its shared "Delta review" rules (`agents/shared/blocks/delta-review.md`): read only files changed since that commit plus direct importers, re-cite unchanged findings after a one-line grep check, and open its report with `Scope: incremental — <n> files reviewed, <m> findings carried forward from <prior report path>`. A specialist with no prior report gets no `Prior report:` line and runs full (`Scope: full`). Under `Scope: full` neither line is sent. Keep the `Scope:` line in `docs/work/sdlc-state.md` when you rewrite it before each HANDOFF below. A carried-forward audit counts as covered in Step 3b (`carried-forward` in its backlog row or report header).
+
 ### Execution Mode Selection — Sequential or Parallel
 
 Ask the user before running audits:
@@ -364,7 +375,7 @@ How would you like to run them?
                    (faster, but you manage N sessions simultaneously)
 ```
 
-**If [P] Parallel:** Emit ALL audit HANDOFFs in one message. User opens N sessions simultaneously. Wait for ALL completion phrases before proceeding to Step 3 synthesis. Do NOT emit partial sets.
+**If [P] Parallel:** Write ALL audit HANDOFF files, then run `handoff-emit.sh` once per file (N pointers, one message, no bodies). User opens N sessions simultaneously. Wait for ALL completion phrases before proceeding to Step 3 synthesis. Do NOT emit partial sets.
 
 **If [S] Sequential:** Run audits one at a time in this order: Security → Code Quality → Performance → Database → UX. Wait for each completion phrase before the next HANDOFF.
 
@@ -1154,7 +1165,7 @@ After each phase/milestone:
 - Delete branches after merge — keep the repo clean
 - Every artifact uses Mermaid for diagrams (not ASCII art, not box-drawing, not plaintext)
 - **Architecture must be modular AND parallel-ready** — feature-sliced, interface-driven, DI, with clear service boundaries, frozen contracts, and write-scope isolation per module. PARALLELIZATION_MAP.md is a Phase 3 deliverable.
-- **Phase 4 supports parallel waves (opt-in per wave).** Default is sequential. Ask the user per wave. In parallel mode, emit all HANDOFFs for a wave in one message, gate on every agent returning with verification ≥ 7 before Wave N+1.
+- **Phase 4 supports parallel waves (opt-in per wave).** Default is sequential. Ask the user per wave. In parallel mode, write every HANDOFF file for the wave and run `handoff-emit.sh` once per file so the pointers land in one message (no bodies in prose), gate on every agent returning with verification ≥ 7 before Wave N+1.
 - **Write-scope isolation is enforced in every parallel-wave HANDOFF** — each agent's assigned module directory is exclusive; cross-module changes must be flagged as deferred, not edited.
 - Every feature addition starts with impact analysis
 - Every design includes sequence diagrams for critical flows
