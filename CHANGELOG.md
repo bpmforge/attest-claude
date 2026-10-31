@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.15.0] — 2026-10-31
+
+Regenerated from attest v3.15.0.
+
+### Added (generated from attest)
+- `wave`, `goal` and `autopilot` skills ported (hand-authored per the attest recipe); the attest-side tracked gap list is now empty.
+- Incremental scanning: `/security` and `/review-code` re-scan only files changed since the last run recorded in `docs/work/scan/ledger.json`; `--full` forces a whole tree; reports print `Scope:`. `DELTA REVIEW` shared block in the eight specialist agents.
+- Fix-verify re-scans only cited + changed files; validators cache whole-tree results and accept `--since`; integration review carries a watermark and `--since auto|full`; a release needs a full-scope review.
+- Harness guards carried over where applicable: stall guard, resume-anchor cadence, compaction trigger (see attest CHANGELOG 3.15.0 for details and the VERIFY-ON-MAC caveats).
+
 ## [3.14.2] — 2026-10-21
 
 Regenerated from attest v3.14.2.
