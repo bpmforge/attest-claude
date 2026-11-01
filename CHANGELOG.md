@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.15.1] — 2026-11-01
+
+Regenerated from attest v3.15.1 (OpenCode v2 contracts verified on the real binary; see the attest CHANGELOG).
+
 ## [3.15.0] — 2026-10-31
 
 Regenerated from attest v3.15.0.
