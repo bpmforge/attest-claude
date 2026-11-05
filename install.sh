@@ -391,6 +391,17 @@ for v in "$SCRIPT_DIR/scripts/validators/"*.sh; do
 done
 echo "  $val_count validators installed"
 
+# ─── 4a2. Symlink scripts/test/ — validate-tests.sh resolves "$(dirname "$0")/../test" and the
+# agents call `node ~/.claude/scripts/test/map.mjs declare ...` (test-impact selection) ───
+mkdir -p "$CLAUDE_HOME/scripts/test"
+tt_count=0
+for t in "$SCRIPT_DIR/scripts/test/"*.mjs; do
+  [ -f "$t" ] || continue
+  ln -sf "$t" "$CLAUDE_HOME/scripts/test/$(basename "$t")"
+  tt_count=$((tt_count + 1))
+done
+echo "  $tt_count test-impact scripts installed"
+
 # ─── 4b. Install Semgrep custom rules ───
 echo "Installing Semgrep custom rules..."
 if [ -d "$SCRIPT_DIR/.semgrep" ]; then

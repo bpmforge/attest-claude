@@ -44,6 +44,9 @@ BROKEN=$(find "$DIR/agents" -type l ! -exec test -e {} \; -print 2>/dev/null | w
 VAL_COUNT=$(find "$DIR/scripts/validators" -name "validate-*.sh" 2>/dev/null | wc -l | tr -d ' ')
 [ "$VAL_COUNT" -ge 40 ] && ok "validators: $VAL_COUNT (expect 40+)" || warn "validators: $VAL_COUNT (expect 40+) — re-run ./install.sh"
 
+TI_COUNT=$(find "$DIR/scripts/test" -name "*.mjs" 2>/dev/null | wc -l | tr -d ' ')
+[ "$TI_COUNT" -ge 5 ] && ok "test-impact scripts: $TI_COUNT (map/select/ledger/resolve/common)" || warn "test-impact scripts: $TI_COUNT (expect 5) — validate-tests.sh falls back to full runs; re-generate from attest"
+
 HOOK_COUNT=$(find "$DIR/hooks" -type f 2>/dev/null | wc -l | tr -d ' ')
 [ "$HOOK_COUNT" -ge 5 ] && ok "hooks: $HOOK_COUNT installed" || warn "hooks: $HOOK_COUNT (expect 9)"
 

@@ -143,6 +143,8 @@ agents/shared/blocks/loop-prevention.compact.md
 agents/shared/blocks/loop-prevention.md
 agents/shared/blocks/research-tools.compact.md
 agents/shared/blocks/research-tools.md
+agents/shared/blocks/test-impact.compact.md
+agents/shared/blocks/test-impact.md
 agents/shared/cards/ANTI_SLOP_CARD.md
 agents/shared/cards/BOUNDED_TASK_CARD.md
 agents/shared/cards/LOOP_PREVENTION_CARD.md
@@ -318,6 +320,11 @@ scripts/run-plan.mjs
 scripts/run-until-done.sh
 scripts/stack-coherence.mjs
 scripts/telemetry-report.mjs
+scripts/test/common.mjs
+scripts/test/ledger.mjs
+scripts/test/map.mjs
+scripts/test/resolve.mjs
+scripts/test/select.mjs
 scripts/validators/_lib.sh
 scripts/validators/_lib_sdlc_config.sh
 scripts/validators/_scope-match.sh
