@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versioning follows [Semantic Versioning](https://semver.org/).
 
+## [3.16.1] — 2026-11-05
+
+`install.sh` registers bpm-code-search-mcp and bpm-memory-mcp with the Node their repo pins (`.nvmrc`), re-registers when the command changed, rebuilds on lockfile/Node change and verifies `initialize`; `doctor.sh` probes each server and names a Node-pin mismatch. Regenerated from attest v3.16.1.
+
 ## [3.16.0] — 2026-11-05
 
 Regenerated from attest v3.16.0 (test-impact selection: `scripts/test/**` linked by `install.sh` into `~/.claude/scripts/test`, `doctor.sh` checks it, the `test-impact` block in test-engineer / coding-agent / sdlc modes; see the attest CHANGELOG). Re-run `./install.sh` after upgrading.

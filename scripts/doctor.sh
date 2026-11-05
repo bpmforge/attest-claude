@@ -72,6 +72,26 @@ if command -v claude >/dev/null 2>&1; then
     for m in memory code-search context7; do
       echo "$MCPS" | grep -qi "$m" && ok "MCP: $m registered" || warn "MCP: $m not registered (see docs/MCP_GUIDE.md)"
     done
+    # Node-built servers: probe initialize with the registered command. A server built
+    # under a pinned Node (.nvmrc) does not load under another major on PATH.
+    for m in memory code-search; do
+      echo "$MCPS" | grep -qi "$m" || continue
+      cmdline=$(claude mcp get "$m" 2>/dev/null | grep -iE '^ *(command|args)' | tr '\n' ' ' | sed -E 's/ *(Command|Args): */ /g; s/^ +//')
+      bin=$(printf '%s' "$cmdline" | awk '{print $1}'); entry=$(printf '%s' "$cmdline" | awk '{print $2}')
+      [ -n "$entry" ] && [ -f "$entry" ] || continue
+      if printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"doctor","version":"1"}}}' \
+         | "$bin" "$entry" 2>/dev/null | head -c 2000 | grep -q '"serverInfo"'; then
+        ok "MCP: $m responds to initialize ($("$bin" -v 2>/dev/null))"
+      else
+        sdir=$(dirname "$entry"); while [ "$sdir" != "/" ] && [ ! -f "$sdir/package.json" ]; do sdir=$(dirname "$sdir"); done
+        pin=""; for f in .nvmrc .node-version; do [ -f "$sdir/$f" ] && pin=$(tr -d 'v \n\r' < "$sdir/$f"); done
+        if [ -n "$pin" ] && [ "$("$bin" -p 'process.versions.node.split(".")[0]' 2>/dev/null)" != "${pin%%.*}" ]; then
+          bad "MCP: $m does not respond — server pins Node $pin but is registered with $bin ($("$bin" -v 2>/dev/null)); re-run ./install.sh"
+        else
+          bad "MCP: $m registered but does not respond — try: $bin $entry"
+        fi
+      fi
+    done
   else
     warn "claude mcp list returned nothing — MCPs unregistered or CLI needs auth"
   fi
